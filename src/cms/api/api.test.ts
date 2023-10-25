@@ -1,5 +1,5 @@
 import app from "../../server";
-import { usersTable } from "../../db/schema";
+import usersTable from "../../db/schema/users";
 import { drizzle } from "drizzle-orm/d1";
 import { sql } from "drizzle-orm";
 import { insertD1Data } from "../data/d1-data";
@@ -71,7 +71,7 @@ describe("auto endpoints", () => {
     let body = await res.json();
     expect(body.data.firstName).toBe("John");
     expect(body.total).toBe(1);
-    expect(body.source).toBe('d1');
+    expect(body.source).toBe("d1");
 
     //if we get again it should be cached
     let req2 = new Request("http://localhost/v1/users/abc", {
@@ -83,8 +83,7 @@ describe("auto endpoints", () => {
     let body2 = await res2.json();
     expect(body2.data.firstName).toBe("John");
     expect(body2.total).toBe(1);
-    expect(body2.source).toBe('cache');
-
+    expect(body2.source).toBe("cache");
   });
 
   it("post (insert) should return 204", async () => {
@@ -144,7 +143,7 @@ describe("auto endpoints", () => {
       data: {
         firstName: "John",
       },
-      table: 'users'
+      table: "users",
     });
 
     let req = new Request(

@@ -1,7 +1,7 @@
 import { insertD1Data, updateD1Data } from "./d1-data";
-import { usersTable } from "../../db/schema";
-import * as schema from "../../db/schema";
-
+import usersTable from "../../db/schema/users";
+import { tableSchemas } from "../../db/routes";
+const schema = tableSchemas;
 import qs from "qs";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
@@ -80,7 +80,6 @@ it("get post related data", async () => {
   expect(post.categories[1].postId).toBe(postRecord.data.id);
   expect(post.comments.length).toBe(2);
   expect(post.comments[0].user.id).toBe(userRecord.data.id);
-
 });
 
 it("getRecords can accept custom function for retrieval of data", async () => {
@@ -98,7 +97,7 @@ it("getRecords can accept custom function for retrieval of data", async () => {
   });
 
   const func = function () {
-    return { foo: "bar"  };
+    return { foo: "bar" };
   };
 
   const result = await getRecords(
@@ -125,20 +124,19 @@ it("getRecords can accept custom function with parameters for retrieval of data"
 
   const urlKey = "http://localhost:8888/some-cache-key-url";
 
-
   const func = async function () {
     const db = drizzle(__D1_BETA__D1DATA, { schema });
 
     return await db.query.postsTable.findFirst({
-    with: {
-      user: true,
-      comments: { with: { user: true } },
-      categories: { with: { category: true } },
-    },
-  });
+      with: {
+        user: true,
+        comments: { with: { user: true } },
+        categories: { with: { category: true } },
+      },
+    });
   };
 
-  const {data} = await getRecords(
+  const { data } = await getRecords(
     env.__D1_BETA__D1DATA,
     env.KVDATA,
     "users",
@@ -166,7 +164,6 @@ it("getRecords can accept custom function with parameters for retrieval of data"
   expect(postCached.data.categories.length).toBe(2);
   expect(postCached.data.user.firstName).toBe("John");
   expect(postCached.source).toBe("cache");
-
 });
 
 async function createRelatedTestRecords() {

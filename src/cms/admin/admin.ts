@@ -17,7 +17,7 @@ import {
 
 import { loadApis } from "./pages/api";
 import { getRecords } from "../data/data";
-import { apiConfig } from "../../db/schema";
+import { apiConfig } from "../../db/routes";
 import { getD1Binding } from "../util/d1-binding";
 import qs from "qs";
 import { format, compareAsc } from "date-fns";
