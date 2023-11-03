@@ -1,6 +1,5 @@
 import { Alert } from "../components/alert"
 export const recoveryForm = (props) => {
-  console.log("props", props)
   let alertObj;
   if (props) {
     const { isError, errorMsg } = props
