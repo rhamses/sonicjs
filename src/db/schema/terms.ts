@@ -1,8 +1,8 @@
 import { sqliteTable } from "drizzle-orm/sqlite-core";
-import { tableName, categoriesSchema } from "../definitions/category";
+import { tableName, termsSchema } from "../definitions/terms";
 import { auditSchema } from "../definitions/audit";
 
 export default sqliteTable(tableName, {
-  ...categoriesSchema,
+  ...termsSchema,
   ...auditSchema,
 });

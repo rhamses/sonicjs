@@ -1,11 +1,8 @@
 import { sqliteTable } from "drizzle-orm/sqlite-core";
-import {
-  tableName,
-  categoriesToPostsSchema,
-} from "../definitions/categoriesToPost";
+import { tableName, termsMetaSchema } from "../definitions/termsMeta";
 import { auditSchema } from "../definitions/audit";
 
 export default sqliteTable(tableName, {
-  ...categoriesToPostsSchema,
+  ...termsMetaSchema,
   ...auditSchema,
 });
