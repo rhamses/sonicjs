@@ -5,6 +5,7 @@ import { api } from "./cms/api/api";
 import { Bindings } from "./cms/types/bindings";
 import { admin } from "./cms/admin/admin";
 import { example } from "./custom/example";
+import { login } from "./cms/login/login";
 import { status } from "./cms/api/status";
 import { log } from "./cms/util/logger";
 
@@ -49,5 +50,6 @@ app.route("/v1", api);
 app.route("/admin", admin);
 app.route("v1/example", example);
 app.route("/status", status);
+app.route("/login", login);
 
 export default app;
