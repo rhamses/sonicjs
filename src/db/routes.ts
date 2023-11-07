@@ -7,14 +7,14 @@ import * as term from "./definitions/terms";
 import * as termMeta from "./definitions/termsMeta";
 import * as option from "./definitions/options";
 
-import * as users from "./definitions/users";
-import * as usersMeta from "./definitions/usersMeta";
-import * as posts from "./definitions/posts";
-import * as postsMeta from "./definitions/postsMeta";
-import * as postsTerm from "./definitions/postTerms";
-import * as terms from "./definitions/terms";
-import * as termsMeta from "./definitions/termsMeta";
-import * as options from "./definitions/options";
+import * as users from "./schema/users";
+import * as usersMeta from "./schema/usersMeta";
+import * as posts from "./schema/posts";
+import * as postsMeta from "./schema/postsMeta";
+import * as postsTerm from "./schema/postTerms";
+import * as terms from "./schema/terms";
+import * as termsMeta from "./schema/termsMeta";
+import * as options from "./schema/options";
 
 export interface ApiConfig {
   table: string;
