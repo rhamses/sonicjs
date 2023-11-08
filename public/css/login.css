@@ -1,9 +1,10 @@
 .logo {
-  background-image: url("/public/images/sonicjs-logo.svg");
+  background-image: url("/public/images/sonicjs-logo-positive.svg");
   height: 100px;
   display: block;
   background-repeat: no-repeat;
   background-position: center;
+  background-size: contain;
   text-indent: -100vw;
   overflow: hidden;
 }
