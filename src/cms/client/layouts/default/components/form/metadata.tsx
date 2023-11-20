@@ -1,4 +1,5 @@
 import { MetadataItem } from "./metadata-item"
+import { FormButton } from "./button"
 const initialMetadata = 3
 const data = []
 
@@ -13,5 +14,5 @@ export const Metadata = () =>
   <div id="metaDataList">
     {data}
     </div>
-    <button type="button" onclick="doAlert()">Adicionar mais um</button>
+    <FormButton type="button" id="metadataAdd" label="Adicionar mais um" class="!bg-body" />
 </section>

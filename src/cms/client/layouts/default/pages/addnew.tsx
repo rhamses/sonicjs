@@ -1,4 +1,3 @@
-import { html } from "hono/html";
 import { pageProps } from "../../../utils/interfaces"
 import { PageWrapper } from "../../../utils/page-wrapper";
 import { FormWrapper } from "../components/form/wrapper";

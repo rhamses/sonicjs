@@ -10,12 +10,14 @@ client.get("/", (ctx) => {
 
 client.get("/list/:posttype", (ctx) => {
   const pageName = ctx.req.param("posttype");
-  return ctx.html(Layout({ children: List({ pageName }) }));
+  const url = ctx.req.url;
+  return ctx.html(Layout({ children: List({ pageName, url }) }));
 });
 
 client.get("/add/:posttype", (ctx) => {
   const pageName = ctx.req.param("posttype");
-  return ctx.html(Layout({ children: AddNew({ pageName }) }));
+  const url = ctx.req.url;
+  return ctx.html(Layout({ children: AddNew({ pageName, url }) }));
 });
 
 client.post("/add/:posttype", async (ctx) => {

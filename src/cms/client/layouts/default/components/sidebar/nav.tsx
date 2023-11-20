@@ -11,26 +11,22 @@ export const SideBarNav = () => html`
   ${
     <NavGroup title="MENU">
       <NavWrapper>
-        <NavItem label="Dashboard" href="#" icon="dashboard">
+        <NavItem label="Dashboard" href="/client" icon="dashboard" />
+        <NavItem label="Posts" href="/client/list/posts" icon="calendar">
           <NavWrapperSubMenu>
-            <NavItem label="Ecommerce" href="#" submenu="true" />
-            <NavItem label="Ecommerce" href="#" submenu="true" />
+            <NavItem label="Categorias" href="/client/list/categories" submenu="true" />
+            <NavItem label="Tags" href="/client/list/tags" submenu="true" />
           </NavWrapperSubMenu>
         </NavItem>
-        <NavItem label="Calendar" href="#" icon="calendar" />
-        <NavItem label="Profile" href="#" icon="profile" />
-        <NavItem label="Forms" href="#" icon="forms" />
-        <NavItem label="Tables" href="#" icon="table" />
-        <NavItem label="Settings" href="#" icon="settings" />
+        <NavItem label="Media" href="/client/list/medias" icon="forms" />
+        <NavItem label="Usuários" href="/client/list/profiles" icon="profile" />
       </NavWrapper>
     </NavGroup>
   }
   ${
-    <NavGroup title="OTHERS">
+    <NavGroup title="Configuração">
       <NavWrapper>
-        <NavItem label="Chart" href="#" icon="chart" />
-        <NavItem label="UI Elements" href="#" icon="ui-elements" />
-        <NavItem label="Authentication" href="#" icon="auth" />
+        <NavItem label="Informações Gerais" href="#" icon="settings" />
       </NavWrapper>
     </NavGroup>
   }
