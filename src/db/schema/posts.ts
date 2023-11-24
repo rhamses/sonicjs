@@ -1,9 +1,6 @@
-import { sqliteTable, index, text } from "drizzle-orm/sqlite-core";
-import { relations } from "drizzle-orm";
+import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { auditSchema } from "./audit";
 import * as users from "./users";
-import * as categoriesToPosts from "./categoriesToPosts";
-import * as comments from "./comments";
 
 export const tableName = "posts";
 
@@ -11,29 +8,19 @@ export const route = "posts";
 
 export const definition = {
   id: text("id").primaryKey(),
-  title: text("title"),
-  body: text("body"),
-  userId: text("userId"),
+  post_author: text("post_author")
+    .notNull()
+    .references(() => users.table.id),
+  post_content: text("post_content"),
+  post_title: text("post_title"),
+  post_slug: text("post_slug"), // = post_name on WP db
+  post_excerpt: text("post_excerpt"),
+  post_status: text("post_status"),
+  post_type: text("post_type"),
+  guid: text("guid"),
 };
 
-export const table = sqliteTable(
-  tableName,
-  {
-    ...definition,
-    ...auditSchema,
-  },
-  (table) => {
-    return {
-      userIdIndex: index("postUserIdIndex").on(table.userId),
-    };
-  }
-);
-
-export const relation = relations(table, ({ one, many }) => ({
-  user: one(users.table, {
-    fields: [table.userId],
-    references: [users.table.id],
-  }),
-  categories: many(categoriesToPosts.table),
-  comments: many(comments.table),
-}));
+export const table = sqliteTable(tableName, {
+  ...definition,
+  ...auditSchema,
+});

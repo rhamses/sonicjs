@@ -1,23 +1,30 @@
 import * as users from "./schema/users";
+import * as usermeta from "./schema/usermeta";
 import * as posts from "./schema/posts";
-import * as comments from "./schema/comments";
-import * as categories from "./schema/categories";
-import * as categoriesToPosts from "./schema/categoriesToPosts";
+import * as postmeta from "./schema/postmeta";
+import * as reltermpost from "./schema/reltermpost";
+import * as terms from "./schema/terms";
+import * as termmeta from "./schema/termmeta";
+import * as options from "./schema/options";
+import * as taxonomy from "./schema/taxonomy";
 
 export interface ApiConfig {
   table: string;
   route: string;
 }
-
 export const apiConfig: ApiConfig[] = [];
-
-export const tableSchemas = {
+export const tableSchemaMap = new Map();
+export const tableSchemas = [
   users,
+  usermeta,
   posts,
-  comments,
-  categories,
-  categoriesToPosts,
-};
+  postmeta,
+  reltermpost,
+  terms,
+  termmeta,
+  options,
+  taxonomy,
+];
 
 for (const key of Object.keys(tableSchemas)) {
   apiConfig.push({

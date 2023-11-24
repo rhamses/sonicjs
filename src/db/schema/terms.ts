@@ -1,8 +1,19 @@
-import { sqliteTable } from "drizzle-orm/sqlite-core";
-import { tableName, termsSchema } from "../definitions/terms";
-import { auditSchema } from "../definitions/audit";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { auditSchema } from "./audit";
+import * as terms from "./terms";
 
-export default sqliteTable(tableName, {
-  ...termsSchema,
+export const tableName = "terms";
+
+export const route = "terms";
+
+export const definition = {
+  id: text("id").primaryKey(),
+  name: text("name"),
+  slug: text("slug"),
+  term_group: integer("term_group").references(() => terms.table.id),
+};
+
+export const table = sqliteTable(tableName, {
+  ...definition,
   ...auditSchema,
 });
