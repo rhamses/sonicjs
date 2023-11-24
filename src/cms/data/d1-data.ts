@@ -1,4 +1,4 @@
-import { definition } from "./../../db/schema/users";
+import { definition } from "../../db/schema-old/users";
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { v4 as uuidv4 } from "uuid";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";

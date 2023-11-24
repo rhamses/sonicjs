@@ -1,5 +1,5 @@
 import app from "../../server";
-import usersTable from "../../db/schema/users";
+import usersTable from "../../db/schema-old/users";
 import { drizzle } from "drizzle-orm/d1";
 import { sql } from "drizzle-orm";
 import { insertD1Data } from "../data/d1-data";
