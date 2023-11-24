@@ -12,9 +12,10 @@ export interface ApiConfig {
   table: string;
   route: string;
 }
+
 export const apiConfig: ApiConfig[] = [];
-export const tableSchemaMap = new Map();
-export const tableSchemas = [
+
+export const tableSchemas = {
   users,
   usermeta,
   posts,
@@ -24,7 +25,7 @@ export const tableSchemas = [
   termmeta,
   options,
   taxonomy,
-];
+};
 
 for (const key of Object.keys(tableSchemas)) {
   apiConfig.push({
