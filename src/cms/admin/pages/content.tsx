@@ -95,6 +95,8 @@ export async function loadTableData(ctx, route) {
 }
 
 export async function loadInMemoryCacheTable(ctx) {
+  const cache_ttl = (ctx.env && ctx.env.cache_ttl) ?? 20 * 60 * 1000;
+
   return (
     <Layout screenTitle={"In Memory Cache"}>
       <div class="row">

@@ -79,14 +79,12 @@ import { log } from "../util/logger";
 // }
 
 export async function getRecords(
-  d1,
-  kv,
+  ctx,
   table,
   params,
   cacheKey,
   source = "fastest",
-  customDataFunction = undefined,
-  ctx = {}
+  customDataFunction = undefined
 ) {
   log(ctx, { level: "verbose", message: "getRecords start", cacheKey });
   const cacheStatusValid = await isCacheValid();
@@ -101,7 +99,7 @@ export async function getRecords(
       level: "verbose",
       message: "getRecords getFromInMemoryCache start",
     });
-    const cacheResult = await getFromInMemoryCache(cacheKey);
+    const cacheResult = await getFromInMemoryCache(ctx, cacheKey);
     log(ctx, {
       level: "verbose",
       message: `getRecords getFromInMemoryCache end. cacheResult:${
@@ -118,12 +116,17 @@ export async function getRecords(
     }
   }
 
+  var executionCtx;
+  try {
+    executionCtx = ctx.executionCtx;
+  } catch (err) {}
+
   if (source == "fastest" || source == "kv") {
     log(ctx, {
       level: "verbose",
       message: "getRecords getRecordFromKvCache start",
     });
-    const kvData = await getRecordFromKvCache(kv, cacheKey);
+    const kvData = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
     log(ctx, {
       level: "verbose",
       message: `getRecords getRecordFromKvCache end. kvData:${
@@ -132,6 +135,34 @@ export async function getRecords(
     });
 
     if (kvData) {
+      //we have the data in KV, but we should still cache it for the next matching request
+      // if (executionCtx) {
+      //   ctx.executionCtx.waitUntil(
+      //     addToInMemoryCache(
+      //       cacheKey,
+      //       { data: kvData.data, source: "cache", total: kvData.total },
+      //       ctx.env.cache_ttl
+      //     )
+      //   );
+      // } else {
+      //   await addToInMemoryCache(
+      //     cacheKey,
+      //     {
+      //       data: kvData.data,
+      //       source: "cache",
+      //       total: kvData.total,
+      //     },
+      //     ctx.env.cache_ttl
+      //   );
+      // }
+      dataAddToInMemoryCache(
+        ctx,
+        executionCtx,
+        cacheKey,
+        kvData.data,
+        kvData.total
+      );
+
       return kvData;
     }
   }
@@ -160,7 +191,7 @@ export async function getRecords(
         level: "verbose",
         message: "getRecords getD1ByTableAndId start",
       });
-      d1Data = await getD1ByTableAndId(d1, table, params.id);
+      d1Data = await getD1ByTableAndId(ctx.env.D1DATA, table, params.id);
       log(ctx, {
         level: "verbose",
         message: "getRecords getD1ByTableAndId end",
@@ -171,7 +202,7 @@ export async function getRecords(
         level: "verbose",
         message: "getRecords getD1DataByTable start",
       });
-      d1Data = await getD1DataByTable(d1, table, params);
+      d1Data = await getD1DataByTable(ctx.env.D1DATA, table, params);
       log(ctx, {
         level: "verbose",
         message: "getRecords getD1DataByTable end",
@@ -187,7 +218,29 @@ export async function getRecords(
     level: "verbose",
     message: "getRecords addToInMemoryCache start",
   });
-  addToInMemoryCache(cacheKey, { data: d1Data, source: "cache", total });
+
+  // HACK to support int testing
+  // if (executionCtx) {
+  //   ctx.executionCtx.waitUntil(
+  //     addToInMemoryCache(
+  //       cacheKey,
+  //       { data: d1Data, source: "cache", total },
+  //       ctx.env.cache_ttl
+  //     )
+  //   );
+  // } else {
+  //   await addToInMemoryCache(
+  //     cacheKey,
+  //     {
+  //       data: d1Data,
+  //       source: "cache",
+  //       total,
+  //     },
+  //     ctx.env.cache_ttl
+  //   );
+  // }
+  dataAddToInMemoryCache(ctx, executionCtx, cacheKey, d1Data, total);
+
   log(ctx, {
     level: "verbose",
     message: "getRecords addToInMemoryCache end",
@@ -197,7 +250,23 @@ export async function getRecords(
     level: "verbose",
     message: "getRecords addToKvCache start",
   });
-  addToKvCache(kv, cacheKey, { data: d1Data, source: "kv", total });
+
+  if (executionCtx) {
+    ctx.executionCtx.waitUntil(
+      await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+        data: d1Data,
+        source: "kv",
+        total,
+      })
+    );
+  } else {
+    await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+      data: d1Data,
+      source: "kv",
+      total,
+    });
+  }
+
   log(ctx, {
     level: "verbose",
     message: "getRecords addToKvCache end",
@@ -207,6 +276,24 @@ export async function getRecords(
   return { data: d1Data, source: "d1", total };
 }
 
+async function dataAddToInMemoryCache(
+  ctx,
+  executionCtx,
+  cacheKey,
+  data,
+  total
+) {
+  // HACK to support int testing
+
+  if (executionCtx) {
+    ctx.executionCtx.waitUntil(
+      addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total })
+    );
+  } else {
+    return addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total });
+  }
+}
+
 export async function insertRecord(d1, kv, data) {
   const content = data;
   const id = uuidv4();
@@ -214,13 +301,14 @@ export async function insertRecord(d1, kv, data) {
   content.data.id = id;
   let error = "";
 
-  // console.log("insertRecord", content);
+  console.log("insertRecord", content);
 
   try {
     const result = await saveKVData(kv, id, content.data);
-    // console.log('result KV', result);
+    // console.log("result KV", result);
     // return ctx.json(id, 201);
   } catch (error) {
+    console.log("error", error);
     error = "error posting content" + error;
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
