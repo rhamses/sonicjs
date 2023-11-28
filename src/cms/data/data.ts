@@ -298,10 +298,8 @@ export async function insertRecord(d1, kv, data) {
   const content = data;
   const id = uuidv4();
   const timestamp = new Date().getTime();
-  content.data.id = id;
+  // content.data.id = id;
   let error = "";
-
-  console.log("insertRecord", content);
 
   try {
     const result = await saveKVData(kv, id, content.data);
@@ -333,9 +331,8 @@ export async function insertRecord(d1, kv, data) {
 
 export async function updateRecord(d1, kv, data) {
   const timestamp = new Date().getTime();
-
   try {
-    const result = await saveKVData(kv, data, timestamp, data.id);
+    const result = await saveKVData(kv, data.id, data);
   } catch (error) {
     console.log("error posting content", error);
     return { code: 500, message: error };
