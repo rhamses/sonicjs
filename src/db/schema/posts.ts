@@ -1,4 +1,4 @@
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { auditSchema } from "./audit";
 import * as users from "./users";
 
@@ -7,7 +7,7 @@ export const tableName = "posts";
 export const route = "posts";
 
 export const definition = {
-  id: text("id").primaryKey(),
+  id: integer("id").primaryKey(),
   post_author: text("post_author")
     .notNull()
     .references(() => users.table.id),

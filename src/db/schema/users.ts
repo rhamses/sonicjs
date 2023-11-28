@@ -1,4 +1,4 @@
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { auditSchema } from "./audit";
 
 export const tableName = "users";
@@ -6,7 +6,7 @@ export const tableName = "users";
 export const route = "users";
 
 export const definition = {
-  id: text("id").primaryKey(),
+  id: integer("id").primaryKey(),
   user_login: text("user_login"),
   user_pass: text("user_pass"),
   user_nicename: text("user_nicename"),

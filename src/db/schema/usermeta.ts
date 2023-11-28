@@ -1,4 +1,4 @@
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { auditSchema } from "./audit";
 import * as users from "./users";
@@ -8,8 +8,8 @@ export const tableName = "usermeta";
 export const route = "usermeta";
 
 export const definition = {
-  id: text("id").primaryKey(),
-  user_id: text("user_id")
+  id: integer("id").primaryKey(),
+  user_id: integer("user_id")
     .notNull()
     .references(() => users.table.id),
   meta_key: text("meta_key"),

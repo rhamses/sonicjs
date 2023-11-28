@@ -8,7 +8,7 @@ export const tableName = "termmeta";
 export const route = "termmeta";
 
 export const definition = {
-  id: text("id").primaryKey(),
+  id: integer("id").primaryKey(),
   term_id: integer("term_id")
     .notNull()
     .references(() => terms.table.id),

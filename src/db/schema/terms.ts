@@ -7,7 +7,7 @@ export const tableName = "terms";
 export const route = "terms";
 
 export const definition = {
-  id: text("id").primaryKey(),
+  id: integer("id").primaryKey(),
   name: text("name"),
   slug: text("slug"),
   term_group: integer("term_group").references(() => terms.table.id),

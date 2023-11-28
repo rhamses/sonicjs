@@ -8,14 +8,14 @@ export const tableName = "taxonomy";
 export const route = "taxonomy";
 
 export const definition = {
-  id: text("id").primaryKey(),
+  id: integer("id").primaryKey(),
   term_id: integer("term_id")
     .notNull()
     .references(() => terms.table.id),
   taxonomy: text("taxonomy"),
   description: text("description"),
-  parent: text("parent"),
-  count: text("count"),
+  parent: integer("parent"),
+  count: integer("count"),
 };
 
 export const table = sqliteTable(tableName, {
