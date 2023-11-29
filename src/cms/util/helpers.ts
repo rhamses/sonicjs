@@ -1,9 +1,9 @@
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 
 export const savePassword = (password) => {
-  const salt = bcrypt.genSaltSync(10);
-  const hash = bcrypt.hashSync(password, salt);
-  return hash;
+  // const salt = bcrypt.genSaltSync(10);
+  // const hash = bcrypt.hashSync(password, salt);
+  return password;
 };
 
 export const slugify = (value: string, separator: string = "-"): string => {

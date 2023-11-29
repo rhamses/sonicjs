@@ -1,4 +1,4 @@
-import { savePassword, slugify } from "./../util/helpers";
+import { savePassword, slugify } from "../util/helpers";
 import { insertRecord, updateRecord, getRecords } from "./data";
 
 interface metaTable {
@@ -18,7 +18,6 @@ export class WPLike {
       env: { KVDATA: kvData, D1DATA: d1Data },
     };
   }
-
   async createTerm(params) {
     let { name, term_group } = params;
     if (!term_group) {
@@ -36,7 +35,6 @@ export class WPLike {
     const term = await insertRecord(this.d1Data, this.kvData, data);
     return term;
   }
-
   async createUser(params) {
     let {
       login: user_login,
@@ -65,7 +63,6 @@ export class WPLike {
     const response = await insertRecord(this.d1Data, this.kvData, data);
     return response;
   }
-
   async createMeta(params: metaTable) {
     const { id, meta_key, meta_value, table } = params;
     if (!table) {
@@ -82,7 +79,6 @@ export class WPLike {
     data.data[idField] = id;
     return await insertRecord(this.d1Data, this.kvData, data);
   }
-
   async createTaxonomy(params) {
     let { id, taxonomy, description, parent } = params;
     if (!id) {
@@ -100,7 +96,6 @@ export class WPLike {
     };
     return await insertRecord(this.d1Data, this.kvData, data);
   }
-
   async createPost(params) {
     let {
       post_author,
@@ -136,7 +131,6 @@ export class WPLike {
     const response = await insertRecord(this.d1Data, this.kvData, data);
     return response;
   }
-
   async createRelTermPost(params) {
     let { term_id, post_id, term_order } = params;
     if (!term_id || !post_id) {
@@ -155,7 +149,6 @@ export class WPLike {
     };
     return await insertRecord(this.d1Data, this.kvData, data);
   }
-
   async createOption(params) {
     const { option_name, option_value } = params;
     const data = {
@@ -167,7 +160,6 @@ export class WPLike {
     };
     return await insertRecord(this.d1Data, this.kvData, data);
   }
-
   async updateUser(params) {
     let {
       login: user_login,
@@ -203,7 +195,6 @@ export class WPLike {
     const response = await updateRecord(this.d1Data, this.kvData, data);
     return response;
   }
-
   async updateTerm(params) {
     const { id, name, term_group } = params;
     const data = {
@@ -234,7 +225,6 @@ export class WPLike {
     data.data["meta_value"] = meta_value;
     return await updateRecord(this.d1Data, this.kvData, data);
   }
-
   async setupDefaultValue() {
     try {
       const hasOnboarded = await getRecords(
@@ -243,10 +233,10 @@ export class WPLike {
         { option_name: "has_onboarded" },
         null
       );
-      console.log("hasOnboarded", hasOnboarded);
+      // console.log("hasOnboarded", hasOnboarded.data[0].option_value:);
       if (
         hasOnboarded.data.length > 0 &&
-        hasOnboarded.data[0].data_value === "true"
+        hasOnboarded.data[0].option_value === "true"
       ) {
         return null;
       }
@@ -271,6 +261,7 @@ export class WPLike {
         name: "Uncategorized",
       };
       const term = await this.createTerm(termData);
+      console.log(term);
       // Create Default Taxonomy
       const taxonomyData = {
         taxonomy: "category",
@@ -295,6 +286,17 @@ export class WPLike {
         post_id: post.data.id,
       };
       const reltermpost = await this.createRelTermPost(reltermpostData);
+      // Set Options Table has_onboarded to TRUE
+      const newOptionData = {
+        option_name: "has_onboarded",
+        option_value: "true",
+      };
+      const hasOnboardedOption = await this.createOption(newOptionData);
+      const newOptionData2 = {
+        option_name: "last_update",
+        option_value: new Date().getTime(),
+      };
+      const lastUpdateOption = await this.createOption(newOptionData2);
       return {
         user,
         usermeta,
@@ -302,10 +304,12 @@ export class WPLike {
         taxonomy,
         post,
         reltermpost,
+        hasOnboardedOption,
+        lastUpdateOption,
       };
     } catch (error) {
       console.log("error", error);
-      return null;
+      return error;
     }
   }
 }
