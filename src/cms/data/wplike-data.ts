@@ -1,5 +1,6 @@
 import { savePassword, slugify } from "./../util/helpers";
-import { insertRecord, updateRecord } from "./data";
+import { insertRecord, updateRecord, getRecords } from "./data";
+
 interface metaTable {
   id: string;
   meta_key: string;
@@ -9,9 +10,13 @@ interface metaTable {
 export class WPLike {
   d1Data: object;
   kvData: object;
+  ctx: object;
   constructor(d1Data, kvData) {
     this.d1Data = d1Data;
     this.kvData = kvData;
+    this.ctx = {
+      env: { KVDATA: kvData, D1DATA: d1Data },
+    };
   }
 
   async createTerm(params) {
@@ -197,5 +202,110 @@ export class WPLike {
     }
     const response = await updateRecord(this.d1Data, this.kvData, data);
     return response;
+  }
+
+  async updateTerm(params) {
+    const { id, name, term_group } = params;
+    const data = {
+      table: "terms",
+      id,
+      data: {},
+    };
+    if (name) {
+      data.data["name"] = name;
+      data.data["slug"] = slugify(name);
+    }
+    if (term_group) {
+      data.data["term_group"] = term_group;
+    }
+    return await updateRecord(this.d1Data, this.kvData, data);
+  }
+  async updateMeta(params) {
+    const { id, meta_key, meta_value, table } = params;
+    const data = {
+      table,
+      id,
+      data: {},
+    };
+    if (!meta_key || !meta_value) {
+      return null;
+    }
+    data.data["meta_key"] = meta_key;
+    data.data["meta_value"] = meta_value;
+    return await updateRecord(this.d1Data, this.kvData, data);
+  }
+
+  async setupDefaultValue() {
+    try {
+      const hasOnboarded = await getRecords(
+        this.ctx,
+        "options",
+        { option_name: "has_onboarded" },
+        null
+      );
+      console.log("hasOnboarded", hasOnboarded);
+      if (
+        hasOnboarded.data.length > 0 &&
+        hasOnboarded.data[0].data_value === "true"
+      ) {
+        return null;
+      }
+      // Create Default User
+      const userData = {
+        login: "admin",
+        email: "admin@example.com",
+        nicename: "The Admin",
+        password: "abc123",
+      };
+      const user = await this.createUser(userData);
+      // Create Default User Meta Data
+      const userMetaData = {
+        id: user.data.id,
+        meta_key: "capabilites",
+        meta_value: JSON.stringify(["administrator"]),
+        table: "usermeta",
+      };
+      const usermeta = await this.createMeta(userMetaData);
+      // Create Default Term
+      const termData = {
+        name: "Uncategorized",
+      };
+      const term = await this.createTerm(termData);
+      // Create Default Taxonomy
+      const taxonomyData = {
+        taxonomy: "category",
+        description: "",
+        parent: 0,
+        id: term.data.id,
+      };
+      const taxonomy = await this.createTaxonomy(taxonomyData);
+      // Create Default Post
+      const postData = {
+        post_author: user.data.id,
+        post_content: `<!-- wp:paragraph --><p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p><!-- /wp:paragraph -->`,
+        post_title: "Hello World!",
+        post_status: "publish",
+        post_type: "post",
+        guid: "http://localhost/",
+      };
+      const post = await this.createPost(postData);
+      // Create Relationship Objects
+      const reltermpostData = {
+        term_id: term.data.id,
+        post_id: post.data.id,
+      };
+      const reltermpost = await this.createRelTermPost(reltermpostData);
+      return {
+        user,
+        usermeta,
+        term,
+        taxonomy,
+        post,
+        reltermpost,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return null;
+    }
   }
 }
