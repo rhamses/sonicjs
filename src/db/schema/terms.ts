@@ -10,7 +10,7 @@ export const definition = {
   id: integer("id").primaryKey(),
   name: text("name"),
   slug: text("slug"),
-  term_group: integer("term_group").references(() => terms.table.id),
+  term_group: integer("term_group"),
 };
 
 export const table = sqliteTable(tableName, {

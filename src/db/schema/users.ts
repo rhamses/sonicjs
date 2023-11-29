@@ -11,7 +11,7 @@ export const definition = {
   user_pass: text("user_pass"),
   user_nicename: text("user_nicename"),
   user_email: text("user_email"),
-  user_status: text("user_status"),
+  user_status: integer("user_status"),
 };
 
 export const table = sqliteTable(tableName, {
