@@ -1,4 +1,4 @@
-import { pageProps } from "../../../utils/interfaces"
+import { pageProps } from "../interface"
 import { PageWrapper } from "../../../utils/page-wrapper";
 import { FormWrapper } from "../components/form/components/form";
 import { FormInput } from "../components/form/inputs";

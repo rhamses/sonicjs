@@ -21,8 +21,9 @@ client.get("/add/:posttype", (ctx) => {
 });
 
 client.post("/add/:posttype", async (ctx) => {
-  const a = await ctx.req.parseBody();
-  console.log("a", JSON.stringify(a));
+  const body = await ctx.req.parseBody();
+  const pageName = ctx.req.param("posttype");
+  console.log("a", JSON.stringify(body));
   return ctx.html("<p>adasd</p>");
 });
 
