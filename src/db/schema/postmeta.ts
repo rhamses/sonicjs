@@ -1,17 +1,18 @@
 import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { auditSchema } from "./audit";
+import * as posts from "./posts";
 
-export const tableName = "users";
+export const tableName = "postmeta";
 
-export const route = "users";
+export const route = "postmeta";
 
 export const definition = {
   id: text("id").primaryKey(),
-  user_login: text("user_login"),
-  user_pass: text("user_pass"),
-  user_nicename: text("user_nicename"),
-  user_email: text("user_email"),
-  user_status: text("user_status"),
+  post_id: text("post_id")
+    .notNull()
+    .references(() => posts.table.id),
+  meta_key: text("meta_key"),
+  meta_value: text("meta_value"),
 };
 
 export const table = sqliteTable(tableName, {

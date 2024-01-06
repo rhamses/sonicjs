@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1695843120627,
-      "tag": "0000_steady_chameleon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1696889283545,
-      "tag": "0001_sudden_newton_destine",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1697168652266,
-      "tag": "0002_lovely_gladiator",
+      "when": 1704492217004,
+      "tag": "0000_silly_spacker_dave",
       "breakpoints": true
     }
   ]

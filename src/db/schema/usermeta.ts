@@ -1,16 +1,19 @@
 import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { auditSchema } from "./audit";
-import * as categoriesToPosts from "./categoriesToPosts";
+import * as users from "./users";
 
-export const tableName = "categories";
+export const tableName = "usermeta";
 
-export const route = "categories";
+export const route = "usermeta";
 
 export const definition = {
   id: text("id").primaryKey(),
-  title: text("title"),
-  body: text("body"),
+  user_id: text("user_id")
+    .notNull()
+    .references(() => users.table.id),
+  meta_key: text("meta_key"),
+  meta_value: text("meta_value"),
 };
 
 export const table = sqliteTable(tableName, {
@@ -19,5 +22,5 @@ export const table = sqliteTable(tableName, {
 });
 
 export const relation = relations(table, ({ many }) => ({
-  posts: many(categoriesToPosts.table),
+  user_id: many(users.table),
 }));
