@@ -270,7 +270,7 @@ function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
 
   db.run(sql`
-    CREATE TABLE ${usersTable} (
+    CREATE TABLE users (
       id text PRIMARY KEY NOT NULL,
       firstName text,
       lastName text,

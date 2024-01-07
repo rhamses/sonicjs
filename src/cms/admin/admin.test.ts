@@ -1,5 +1,4 @@
 import app from "../../server";
-import usersTable from "../../db/schema-old/users";
 import { drizzle } from "drizzle-orm/d1";
 import { sql } from "drizzle-orm";
 import { insertD1Data } from "../data/d1-data";
@@ -102,9 +101,9 @@ describe("Test admin api", () => {
 
 function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
-  console.log("creating test table");
+  console.log("creating test table start");
   db.run(sql`
-    CREATE TABLE ${usersTable} (
+    CREATE TABLE users (
       id text PRIMARY KEY NOT NULL,
       firstName text,
       lastName text,
@@ -115,6 +114,7 @@ function createTestTable() {
       updatedOn integer
     );
 	`);
+  console.log("creating test table end");
 
   return db;
 }
