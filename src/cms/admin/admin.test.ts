@@ -17,6 +17,7 @@ describe("Test admin front end", () => {
 });
 
 describe("Test admin api", () => {
+
   it("admin api should return 200", async () => {
     createTestTable();
     await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
