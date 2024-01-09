@@ -233,7 +233,7 @@ export class WPLike {
         { option_name: "has_onboarded" },
         null
       );
-      // console.log("hasOnboarded", hasOnboarded.data[0].option_value:);
+      console.log("hasOnboarded", hasOnboarded.data[0].option_value);
       if (
         hasOnboarded.data.length > 0 &&
         hasOnboarded.data[0].option_value === "true"
@@ -308,7 +308,7 @@ export class WPLike {
         lastUpdateOption,
       };
     } catch (error) {
-      console.log("error", error);
+      console.log("errorssss", error);
       return error;
     }
   }

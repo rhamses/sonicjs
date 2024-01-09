@@ -1,6 +1,5 @@
 import {
   generateSelectSql,
-  getByTable,
   getD1DataByTable,
   insertD1Data,
   updateD1Data,
@@ -10,7 +9,6 @@ import {
 } from "./d1-data";
 import { tableSchemas } from "../../db/routes";
 import qs from "qs";
-const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";

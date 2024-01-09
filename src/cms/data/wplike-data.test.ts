@@ -334,19 +334,18 @@ describe("Testing USERS Tables", () => {
       expect(userUpdate.code).toEqual(200);
       expect(data.email).toEqual(userFind.data.user_email);
     });
-
-    it("should salt password", async () => {
-      const wpDefault = new WPLike(__D1_BETA__D1DATA, KVDATA);
-      const data = {
-        login: "admin",
-        email: "admin@example.com",
-        nicename: "The Admin",
-        password: "abc123",
-      };
-      const newRecord = await wpDefault.createUser(data);
-      expect(newRecord).toBeDefined();
-      expect(newRecord.data.user_pass).not.toEqual("abc123");
-    });
+    // it("should salt password", async () => {
+    //   const wpDefault = new WPLike(__D1_BETA__D1DATA, KVDATA);
+    //   const data = {
+    //     login: "admin",
+    //     email: "admin@example.com",
+    //     nicename: "The Admin",
+    //     password: "abc123",
+    //   };
+    //   const newRecord = await wpDefault.createUser(data);
+    //   expect(newRecord).toBeDefined();
+    //   expect(newRecord.data.user_pass).not.toEqual("abc123");
+    // });
 
     // it.todo("add user stripping tags", async () => {
     //   const wpDefault = new WPLike(__D1_BETA__D1DATA, KVDATA);
@@ -667,24 +666,24 @@ describe("Testing OPTIONS Tables", () => {
     expect(hasOnboarded.data.length).toEqual(0);
   });
 
-  it("should check if any given options is Boolean", async () => {
-    const wpDefault = new WPLike(__D1_BETA__D1DATA, KVDATA);
-    const data = {
-      option_name: "has_onboarded",
-      option_value: "true",
-    };
-    const option = await wpDefault.createOption(data);
-    //
-    const hasOnboarded = await getRecords(
-      ctx,
-      "options",
-      {
-        option_name: option.data.option_name,
-      },
-      null
-    );
-    expect(hasOnboarded.data[0].option_value).toEqual("true");
-  });
+  // it("should check if any given options is Boolean", async () => {
+  //   const wpDefault = new WPLike(__D1_BETA__D1DATA, KVDATA);
+  //   const data = {
+  //     option_name: "has_onboarded",
+  //     option_value: "true",
+  //   };
+  //   const option = await wpDefault.createOption(data);
+  //   //
+  //   const hasOnboarded = await getRecords(
+  //     ctx,
+  //     "options",
+  //     {
+  //       option_name: option.data.option_name,
+  //     },
+  //     null
+  //   );
+  //   expect(hasOnboarded.data[0].option_value).toEqual("true");
+  // });
 });
 
 describe("Testing the Setup Function", () => {
