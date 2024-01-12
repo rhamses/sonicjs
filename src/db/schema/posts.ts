@@ -24,7 +24,3 @@ export const table = sqliteTable(tableName, {
   ...definition,
   ...auditSchema,
 });
-export const table = sqliteTable(tableName, {
-  ...definition,
-  ...auditSchema,
-});
