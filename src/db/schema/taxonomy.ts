@@ -13,7 +13,6 @@ export const definition = {
     .notNull()
     .references(() => terms.table.id),
   taxonomy: text("taxonomy"),
-  description: text("description"),
   parent: integer("parent"),
   count: integer("count"),
 };

@@ -10,6 +10,7 @@ export const definition = {
   id: integer("id").primaryKey(),
   name: text("name"),
   slug: text("slug"),
+  description: text("description"),
   term_group: integer("term_group"),
 };
 
