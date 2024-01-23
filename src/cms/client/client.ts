@@ -1,30 +1,38 @@
 import { Hono } from "hono";
-import { Layout } from "./layouts/default/default";
-import { List } from "./layouts/default/pages/list";
-import { AddNew } from "./layouts/default/pages/addnew";
+import { RouterController } from "./layouts/default/controllers";
+
 const client = new Hono();
 
-client.get("/", (ctx) => {
-  return ctx.html(Layout({}));
-});
+client.get("/", async (ctx) => await new RouterController(ctx).list());
+client.get(
+  "/list/:posttype",
+  async (ctx) => await new RouterController(ctx).list()
+);
+client.delete(
+  "/list/:posttype/:id",
+  async (ctx) => await new RouterController(ctx).delete()
+);
+client.get(
+  "/add/:posttype",
+  async (ctx) => await new RouterController(ctx).add()
+);
+/**
+ * ADD ROUTES
+ */
+client.post(
+  "/add/:posttype",
+  async (ctx) => await new RouterController(ctx).add()
+);
 
-client.get("/list/:posttype", (ctx) => {
-  const pageName = ctx.req.param("posttype");
-  const url = ctx.req.url;
-  return ctx.html(Layout({ children: List({ pageName, url }) }));
-});
-
-client.get("/add/:posttype", (ctx) => {
-  const pageName = ctx.req.param("posttype");
-  const url = ctx.req.url;
-  return ctx.html(Layout({ children: AddNew({ pageName, url }) }));
-});
-
-client.post("/add/:posttype", async (ctx) => {
-  const body = await ctx.req.parseBody();
-  const pageName = ctx.req.param("posttype");
-  console.log("a", JSON.stringify(body));
-  return ctx.html("<p>adasd</p>");
-});
-
+/**
+ * EDIT ROUTES
+ */
+client.get(
+  "/edit/:posttype/:id",
+  async (ctx) => await new RouterController(ctx).edit()
+);
+client.post(
+  "/edit/:posttype/:id",
+  async (ctx) => await new RouterController(ctx).edit()
+);
 export { client };
