@@ -1,4 +1,4 @@
-import { html, raw } from "hono/html";
+import { html } from "hono/html";
 import { SearchForm } from "../components/search/form"
 import { LoggedInMenu } from "../components/header/logged-in-menu";
 import { ProfileHeader } from "../components/header/profile";
