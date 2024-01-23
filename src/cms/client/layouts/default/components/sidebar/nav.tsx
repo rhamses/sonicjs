@@ -12,7 +12,7 @@ export const SideBarNav = async (props: pageProps) => {
           <NavItem label="Posts" href="/client/list/posts" icon="calendar">
             <NavWrapperSubMenu>
               <NavItem label="Categorias" href="/client/list/terms?type=category" submenu="true" />
-              <NavItem label="Tags" href="/client/list/tags" submenu="true" />
+              <NavItem label="Tags" href="/client/list/terms?type=tags" submenu="true" />
             </NavWrapperSubMenu>
           </NavItem>
           <NavItem label="Media" href="/client/list/medias" icon="forms" />
