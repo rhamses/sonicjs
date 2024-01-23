@@ -1,8 +1,15 @@
 export interface pageProps {
-  pageName?: string;
+  posttype?: string;
   children?: any;
   action?: string;
   url?: string;
+  query?: Object;
+  ctx?: Object;
+  d1Data?: D1Database;
+  body?: {
+    headers: Array<string>;
+    data: any;
+  };
 }
 export interface optionalValues {
   label?: string;
@@ -40,4 +47,11 @@ export interface FormWrapper {
 }
 export interface MetaDataItem {
   index?: number;
+}
+
+export interface metaTable {
+  id: string;
+  meta_key: string;
+  meta_value: any;
+  table: string;
 }

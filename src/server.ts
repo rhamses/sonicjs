@@ -9,11 +9,6 @@ import { admin } from "./cms/admin/admin";
 import { status } from "./cms/api/status";
 import { log } from "./cms/util/logger";
 
-// SETUP INITIAL WPLIKE
-// const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
-// const wpObject = new WPLike(__D1_BETA__D1DATA, KVDATA);
-// wpObject.setupDefaultValue();
-
 const app = new Hono<{ Bindings: Bindings }>();
 
 //CORS
