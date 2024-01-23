@@ -188,8 +188,12 @@ body {
 /*
  * Form Builder
  */
-.formio-component-systemId{
+.formio-component-systemId {
   background: var(--bs-light);
   padding: 30px;
   border-radius: 8px;
+}
+
+.hide {
+  outline: solid 1px red;
 }
