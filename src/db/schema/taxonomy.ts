@@ -9,9 +9,7 @@ export const route = "taxonomy";
 
 export const definition = {
   id: integer("id").primaryKey(),
-  term_id: integer("term_id")
-    .notNull()
-    .references(() => terms.table.id),
+  term_id: integer("term_id").notNull(),
   taxonomy: text("taxonomy"),
   parent: integer("parent"),
   count: integer("count"),
@@ -22,6 +20,6 @@ export const table = sqliteTable(tableName, {
   ...auditSchema,
 });
 
-export const relation = relations(table, ({ many }) => ({
-  term_id: many(terms.table),
-}));
+// export const relation = relations(table, ({ many }) => ({
+//   term_id: many(terms.table),
+// }));
