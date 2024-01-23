@@ -1,5 +1,8 @@
+.mocks
 node_modules
 dist
+.DS_Store
+src/.DS_Store
 .wrangler/state
 wrangler.toml
 .vscode/settings.json
