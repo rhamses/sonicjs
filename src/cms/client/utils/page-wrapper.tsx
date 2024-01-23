@@ -1,11 +1,15 @@
 import { pageProps } from "../layouts/default/interface";
 import { FormButton } from "../layouts/default/components/form/inputs"
 export const PageWrapper = (props: pageProps) => {
-  let appendix = "?";
+  let appendix = "";
   if (Object.keys(props.query).length > 0) {
     for (const item of Object.keys(props.query)) {
       if (props.query[item]) {
-        appendix += `${item}=${props.query[item]}&`
+        if(appendix.length == 0) {
+          appendix += `?${item}=${props.query[item]}`
+        } else {
+          appendix += `&${item}=${props.query[item]}`
+        }
       }
     }
   }
