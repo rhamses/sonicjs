@@ -5,7 +5,7 @@ import { FormProfiles } from "./forms/profiles";
 import { FormPosts } from "./forms/post";
 import { FormTerms } from "./forms/terms";
 import { FormTaxonomy } from "./forms/taxonomy";
-export const AddNew = (props: pageProps) => { 
+export const AddNew = async (props: pageProps) => { 
   let html;
   if (props.posttype == "users") {
     html = FormProfiles(props)
@@ -18,7 +18,7 @@ export const AddNew = (props: pageProps) => {
   }
   return (
     <PageWrapper action="Add new" posttype={props.posttype} query={(props.query) ? props.query : ""}>
-      <FormWrapper>{ html }</FormWrapper>
+      <FormWrapper body={props.body} posttype={props.posttype}>{ html }</FormWrapper>
     </PageWrapper>
   )
 }
