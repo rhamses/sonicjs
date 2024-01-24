@@ -1,5 +1,6 @@
 export interface pageProps {
   posttype?: string;
+  postauthor?: string;
   children?: any;
   action?: string;
   url?: string;
@@ -37,6 +38,10 @@ export interface FormSelect extends defaultValues {
   data: Array<FormSelectData>;
   emptySelectText: String;
 }
+export interface AsideWrapper {
+  posttype: string;
+  body: any;
+}
 export interface AsideItemData {
   title: string;
   description?: string;
@@ -44,6 +49,8 @@ export interface AsideItemData {
 }
 export interface FormWrapper {
   children?: any;
+  posttype: string;
+  body: any;
 }
 export interface MetaDataItem {
   index?: number;

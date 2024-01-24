@@ -8,7 +8,7 @@ interface metaTable {
   table: string;
 }
 export class WPLike {
-  d1Data: object;
+  d1Data: D1Database;
   kvData: object;
   ctx: object;
   constructor(d1Data, kvData) {
@@ -311,5 +311,31 @@ export class WPLike {
       console.log("errorssss", error);
       return error;
     }
+  }
+  async getTaxonomy(taxonomy: string, posttype: string) {
+    const { data } = await getRecords(
+      this.ctx,
+      posttype,
+      {},
+      taxonomy + "-list",
+      "",
+      async () => {
+        const sql = `SELECT t.*, 
+            (
+              SELECT COUNT(*) 
+              FROM terms as t 
+              INNER JOIN taxonomy as x 
+              ON x.term_id = t.id 
+              WHERE x.taxonomy = "${taxonomy}" 
+            ) as total 
+            FROM terms as t
+            INNER JOIN taxonomy as x 
+            ON x.term_id = t.id 
+            WHERE x.taxonomy = "${taxonomy}" `;
+        const { results } = await this.d1Data.prepare(sql).all();
+        return results;
+      }
+    );
+    return data;
   }
 }
