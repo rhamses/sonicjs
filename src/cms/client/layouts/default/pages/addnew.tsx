@@ -18,7 +18,7 @@ export const AddNew = async (props: pageProps) => {
   }
   return (
     <PageWrapper action="Add new" posttype={props.posttype} query={(props.query) ? props.query : ""}>
-      <FormWrapper body={props.body} posttype={props.posttype}>{ html }</FormWrapper>
+      <FormWrapper props={props} taxonomy={props.taxonomy} body={props.body} posttype={props.posttype}>{ html }</FormWrapper>
     </PageWrapper>
   )
 }
