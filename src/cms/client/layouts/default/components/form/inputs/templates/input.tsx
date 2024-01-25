@@ -6,7 +6,9 @@ export default (props: FormInputGeneral) =>
     {(props.label) ? <label for={props.id} class={ (props.classLabel) ? labelCSS + props.classLabel : labelCSS }>{ props.label}</label>: ""}
   {
     (props.type === "textarea")
-    ? <textarea id={props.id} name={props.id} class={ (props.classInput) ? inputCSS + props.classInput: inputCSS }></textarea>
-    : <input id={props.id} name={props.id} type={props.type} class={ (props.classInput) ? inputCSS + props.classInput : inputCSS } value={(props.value ? props.value : "")} />
+        ? <textarea id={props.id} name={props.id} class={(props.classInput) ? inputCSS + props.classInput : inputCSS}>{ props.children }</textarea>
+        : (props.checked == "checked")
+          ? <input checked id={props.id} name={props.id} type={props.type} class={ (props.classInput) ? inputCSS + props.classInput : inputCSS } value={(props.value ? props.value : "")} />
+          : <input id={props.id} name={props.id} type={props.type} class={ (props.classInput) ? inputCSS + props.classInput : inputCSS } value={(props.value ? props.value : "")} />
   }
 </div>

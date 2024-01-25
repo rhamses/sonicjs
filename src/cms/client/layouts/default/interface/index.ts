@@ -1,3 +1,4 @@
+import { Taxonomy } from "./../controllers/sections/taxonomy";
 export interface pageProps {
   posttype?: string;
   postauthor?: string;
@@ -7,6 +8,7 @@ export interface pageProps {
   query?: Object;
   ctx?: Object;
   d1Data?: D1Database;
+  taxonomy?: any;
   body?: {
     headers: Array<string>;
     data: any;
@@ -33,6 +35,8 @@ export interface FormSelectData {
 }
 export interface FormInputGeneral extends defaultValues {
   value?: string;
+  checked?: string;
+  children?: string;
 }
 export interface FormSelect extends defaultValues {
   data: Array<FormSelectData>;
@@ -41,6 +45,9 @@ export interface FormSelect extends defaultValues {
 export interface AsideWrapper {
   posttype: string;
   body: any;
+  props?: any;
+  taxonomy?: any;
+  ctx?: any;
 }
 export interface AsideItemData {
   title: string;
@@ -51,9 +58,17 @@ export interface FormWrapper {
   children?: any;
   posttype: string;
   body: any;
+  taxonomy: any;
+  props?: any;
 }
 export interface MetaDataItem {
   index?: number;
+  posttype?: string;
+  body?: any;
+  postId?: string;
+  ctx?: any;
+  props?: any;
+  record?: any;
 }
 
 export interface metaTable {
