@@ -1,5 +1,5 @@
 import { savePassword, slugify } from "../util/helpers";
-import { insertRecord, updateRecord, getRecords } from "./data";
+import { insertRecord, updateRecord, getRecords, deleteRecord } from "./data";
 
 interface metaTable {
   id: string;
@@ -337,5 +337,47 @@ export class WPLike {
       }
     );
     return data;
+  }
+  async listRecords(table: string, params: any, id: string) {
+    try {
+      console.log("+++++", table, params, id);
+      const { data } = await getRecords(
+        this.ctx,
+        table,
+        params,
+        table + "-" + id + "-list"
+      );
+      return data;
+    } catch (error) {
+      console.log("-----error", error);
+    }
+  }
+  async deletePost(postID) {
+    const tables = ["reltermpost", "postmeta", "posts"];
+    for (const table of tables) {
+      if (table != "posts") {
+        // GET REL ENTRIES
+        const { data } = await getRecords(
+          this.ctx,
+          table,
+          { post_id: postID },
+          ""
+        );
+        // AND DELETE IT
+        for (const item of data) {
+          const deleteBody = {
+            id: item.id,
+            table,
+          };
+          await deleteRecord(this.d1Data, this.kvData, deleteBody);
+        }
+      } else {
+        const deleteBody = {
+          id: postID,
+          table,
+        };
+        await deleteRecord(this.d1Data, this.kvData, deleteBody);
+      }
+    }
   }
 }
