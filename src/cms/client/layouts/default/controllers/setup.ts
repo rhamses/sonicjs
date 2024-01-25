@@ -1,3 +1,4 @@
+import { Taxonomy } from "./sections/taxonomy";
 import { WPLike } from "../../../../data/wplike-data";
 
 export class SetupController {
@@ -37,6 +38,7 @@ export class SetupController {
       kvdata: this.KVDATA,
       posttype: this.posttype,
       query: this.ctx.req.query(),
+      taxonomy: {},
       body: {},
     };
   }

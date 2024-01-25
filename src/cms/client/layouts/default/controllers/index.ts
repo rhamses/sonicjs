@@ -1,9 +1,4 @@
-import {
-  deleteRecord,
-  getRecords,
-  insertRecord,
-  updateRecord,
-} from "../../../../data/data";
+import { getRecords, insertRecord, updateRecord } from "../../../../data/data";
 import { getHeaders } from "../../../utils/tableHeaders";
 import { Layout } from "../default";
 import { List } from "../pages/list";
@@ -23,58 +18,60 @@ export class RouterController extends SetupController {
   }
   private async prepareBody() {
     const body = await this.body;
-    // console.log("===>body", JSON.stringify(body));
     const includeData = {};
     // prepare record
     for (const key of Object.keys(body)) {
-      if (key.includes("[")) {
-        const table = key.split("[")[0];
-        if (getSchemaFromTable(table)) {
-          const fieldKey = key.match(/'(.+)'/)[1];
-          if (!includeData[table]) {
-            includeData[table] = {};
-          }
-          // FORMAT RELTERMPOST
-          if (table.includes("reltermpost")) {
-            let values = Object.values(body[key]);
-            if (Array.isArray(values)) {
-              values = values.map((value) => {
-                return {
-                  term_id: value,
-                };
-              });
-              // console.log("====values1", values);
-            } else {
-              values = { term_id: values };
-              // console.log("====values2", values);
+      if (body[key] != "") {
+        if (key.includes("[")) {
+          const table = key.split("[")[0];
+          if (getSchemaFromTable(table)) {
+            const fieldKey = key.match(/'(.+)'/)[1];
+            if (!includeData[table]) {
+              includeData[table] = {};
             }
-            includeData[table] = values;
-          }
-          if (table.includes("meta")) {
-            // FORMAT META VALUES
-            if (!Array.isArray(includeData[table])) {
-              includeData[table] = [];
-            }
-            for (const [idx, item] of body[key].entries()) {
-              if (includeData[table][idx] == undefined) {
-                includeData[table][idx] = {};
+            // FORMAT RELTERMPOST
+            if (table.includes("reltermpost")) {
+              let values = Object.values(body[key]);
+              if (Array.isArray(values)) {
+                values = values.map((value) => {
+                  return {
+                    term_id: value,
+                  };
+                });
+                // console.log("====values1", values);
+              } else {
+                values = { term_id: values };
+                // console.log("====values2", values);
               }
-              includeData[table][idx][fieldKey] = item;
+              includeData[table] = values;
             }
-          }
-          // FORMAT FIELDS WITH INDEXES ON THEM
-          if (!fieldKey.match(/[0-9]+/)) {
-            includeData[table][fieldKey] = body[key];
-          } else {
-            const arrIndex = fieldKey.match(/[0-9]+/)[0];
-            const arrObjKey = fieldKey.replace("-" + arrIndex, "");
-            if (!Array.isArray(includeData[table])) {
-              includeData[table] = [];
+            // FORMAT META FIELDS
+            if (table.includes("meta")) {
+              // FORMAT META VALUES
+              if (!Array.isArray(includeData[table])) {
+                includeData[table] = [];
+              }
+              for (const [idx, item] of body[key].entries()) {
+                if (includeData[table][idx] == undefined) {
+                  includeData[table][idx] = {};
+                }
+                includeData[table][idx][fieldKey] = item;
+              }
             }
-            if (includeData[table][arrIndex] == undefined) {
-              includeData[table][arrIndex] = {};
+            // FORMAT FIELDS WITH INDEXES ON THEM
+            if (!fieldKey.match(/[0-9]+/)) {
+              includeData[table][fieldKey] = body[key];
+            } else {
+              const arrIndex = fieldKey.match(/[0-9]+/)[0];
+              const arrObjKey = fieldKey.replace("-" + arrIndex, "");
+              if (!Array.isArray(includeData[table])) {
+                includeData[table] = [];
+              }
+              if (includeData[table][arrIndex] == undefined) {
+                includeData[table][arrIndex] = {};
+              }
+              includeData[table][arrIndex][arrObjKey] = body[key];
             }
-            includeData[table][arrIndex][arrObjKey] = body[key];
           }
         }
       }
@@ -122,13 +119,12 @@ export class RouterController extends SetupController {
       if (this.posttype == "posts") {
         const taxonomy = "category";
         const categories = await this.wp.getTaxonomy(taxonomy, this.posttype);
-        this.viewParam.body[taxonomy] = categories;
+        this.viewParam.taxonomy[taxonomy] = categories;
       }
       const page = this.getPage(AddNew);
       return this.pageLoad();
     } else if (this.ctx.req.method == "POST") {
       const body = await this.prepareBody();
-      // console.log("===>bodyPrepared", body);
       let lastID = {};
       let resultResponse;
       for (const table of this.tableOrder) {
@@ -205,8 +201,13 @@ export class RouterController extends SetupController {
         this.ctx,
         this.posttype,
         { id: this.pageID },
-        this.posttype + "-edit"
+        this.posttype + "-" + this.pageID + "-edit"
       );
+      if (this.posttype == "posts") {
+        const taxonomy = "category";
+        const categories = await this.wp.getTaxonomy(taxonomy, this.posttype);
+        this.viewParam.taxonomy[taxonomy] = categories;
+      }
       const headers = getHeaders(data);
       this.viewParam.body.headers = headers;
       this.viewParam.body.data = data;
@@ -267,14 +268,14 @@ export class RouterController extends SetupController {
   }
   async delete() {
     try {
-      const data = await deleteRecord(this.d1Data, this.KVDATA, {
-        id: this.pageID,
-        table: this.posttype,
-      });
+      switch (this.posttype) {
+        case "posts":
+          await this.wp.deletePost(this.pageID);
+          break;
+      }
       return this.ctx.json({
         success: true,
         message: "Delete Successful",
-        data,
       });
     } catch (error) {
       console.log(error);
