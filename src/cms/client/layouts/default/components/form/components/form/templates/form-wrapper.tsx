@@ -6,6 +6,6 @@ export default (props: FormWrapper) =>
       { props.children }
     </section>
     <aside class="flex flex-col gap-5.5 py-6.5 basis-3/12 border-l border-stroke">
-      <AsideWrapper body={props.body} posttype={props.posttype} />
+      <AsideWrapper ctx={props.props.ctx} taxonomy={props.taxonomy} props={props} body={props.body} posttype={props.posttype} />
     </aside>
 </form>
