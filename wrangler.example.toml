@@ -23,5 +23,5 @@ database_id = "${DATABASE_ID}"
 
 # Run the `wrangler r2 create sonicjs` command and copy the id below
 [[r2_buckets]]
-binding = "js_compatible_name"
+binding = "R2_BUCKET"
 bucket_name = "${bucket_name}"

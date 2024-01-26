@@ -59,5 +59,6 @@ app.route("/v1", api);
 app.route("/admin", admin);
 // app.route("v1/example", example);
 app.route("/status", status);
-app.route("/client", client);app.route("/bucket", bucket);
+app.route("/client", client);
+app.route("/bucket", bucket);
 export default app;
