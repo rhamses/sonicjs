@@ -4,10 +4,10 @@
   "description": "Headless CMS based on Cloudflare Workers",
   "main": "src/server.ts",
   "scripts": {
-    "dev": "run-p dev:*",
-    "dev:wrangler": "wrangler pages dev dist",
-    "dev:esbuild": "node ./src/cms/util/build.mjs",
     "build": "node ./src/cms/util/build.mjs",
+    "dev": "run-p dev:*",
+    "dev:esbuild": "node ./src/cms/util/watch.mjs",
+    "dev:wrangler": "wrangler pages dev dist --live-reload true",
     "deploy": "wrangler pages deploy dist",
     "test": "jest --verbose",
     "generate": "drizzle-kit generate:sqlite --schema=./src/db/schema --out=./migrations",
@@ -22,7 +22,7 @@
     "drizzle-kit": "^0.19.12",
     "esbuild": "^0.17.18",
     "esbuild-plugin-copy": "^2.1.1",
-    "miniflare": "^3.20231030.2",
+    "miniflare": "^3.20231218.3",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.0.4",
     "wrangler": "^3.10.0"
