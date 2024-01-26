@@ -59,5 +59,4 @@ app.route("/admin", admin);
 // app.route("v1/example", example);
 app.route("/status", status);
 app.route("/client", client);
-
 export default app;

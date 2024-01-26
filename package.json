@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "run-p dev:*",
     "dev:wrangler": "wrangler pages dev dist",
-    "dev:esbuild": "node ./src/cms/util/build.mjs",
+    "dev:esbuild": "node ./src/cms/util/watch.mjs",
     "dev:tailwind": "npx tailwindcss -i ./src/index.css -o ./dist/public/css/index.css",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
