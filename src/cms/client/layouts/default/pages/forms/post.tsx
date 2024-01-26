@@ -10,5 +10,5 @@ export const FormPosts = (props: pageProps) =>
     <FormInput value={props?.posttype} id="posts['post_type']" type="hidden" />
     <FormInput value={(props?.postauthor) ? props.postauthor : "1"} id="posts['post_author']" type="hidden" />
     <hr />
-    <MetaData props={props} />
+    <MetaData ctx={props.ctx} body={props.body} props={props} />
   </>

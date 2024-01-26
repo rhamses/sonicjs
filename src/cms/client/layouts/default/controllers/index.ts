@@ -18,6 +18,7 @@ export class RouterController extends SetupController {
   }
   private async prepareBody() {
     const body = await this.body;
+
     const includeData = {};
     // prepare record
     for (const key of Object.keys(body)) {

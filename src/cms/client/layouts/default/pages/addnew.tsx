@@ -5,7 +5,7 @@ import { FormProfiles } from "./forms/profiles";
 import { FormPosts } from "./forms/post";
 import { FormTerms } from "./forms/terms";
 import { FormTaxonomy } from "./forms/taxonomy";
-export const AddNew = async (props: pageProps) => { 
+export const AddNew =  (props: pageProps) => { 
   let html;
   if (props.posttype == "users") {
     html = FormProfiles(props)
