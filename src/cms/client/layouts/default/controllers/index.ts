@@ -18,7 +18,8 @@ export class RouterController extends SetupController {
   }
   private async prepareBody() {
     const body = await this.body;
-
+    console.log("body1", body["post_thumbnail"]);
+    console.log("body", JSON.stringify(body));
     const includeData = {};
     // prepare record
     for (const key of Object.keys(body)) {
@@ -126,6 +127,8 @@ export class RouterController extends SetupController {
       return this.pageLoad();
     } else if (this.ctx.req.method == "POST") {
       const body = await this.prepareBody();
+      console.log("body", body["posts"]["post_thumbnail"]);
+      return false;
       let lastID = {};
       let resultResponse;
       for (const table of this.tableOrder) {

@@ -35,18 +35,39 @@ export default async (props: AsideWrapper) => {
       }
     })
   }
-  if (props.posttype && props.posttype == "posts") {
+  if (props.posttype) {
     html = <>
-      <AsideItem title="Status da publicação" description="">
-        <FormSelect data={selectData} emptySelectText="Selecione um Status" id="posts['post_status']" type="select" />
+      <AsideItem
+        title="Status da publicação"
+        description=""
+      >
+        <FormSelect
+          id={props?.posttype + "['post_status']"}
+          type="select"
+          data={selectData}
+          emptySelectText="Selecione um Status"
+        />
       </AsideItem>
-      <AsideItem title="Imagem em Destaque" description="Selecione a imagem em destaque do post">
-        <FormInput id="imageHighlight" type="file" />
+      <AsideItem
+        title="Imagem em Destaque"
+        description="Selecione a imagem em destaque do post"
+      >
+        <FormInput
+          id={props?.posttype + "['post_thumbnail']"}
+          type="file"
+        />
       </AsideItem>
-      <AsideItem title="Categorias" description="Selecione as categorias">
+      <AsideItem
+        title="Categorias"
+        description="Selecione as categorias"
+      >
         {htmlTaxonomies.map(item => item)}
       </AsideItem>
-      <AsideItem title="Titulo do Post Type" description="Selecione um post type para relacionadar" /></>
+      <AsideItem
+        title="Titulo do Post Type"
+        description="Selecione um post type para relacionadar"
+      />
+    </>
   }
   return (
     <>
