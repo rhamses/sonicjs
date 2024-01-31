@@ -1,3 +1,8 @@
+/**
+ *
+ * DELETE GRID FUNCTIONS
+ *
+ */
 function deleteItem(el) {
   const id = el.target.dataset.id;
   const input = `${location.pathname}/${id}`;
@@ -12,7 +17,6 @@ function deleteItem(el) {
     })
     .catch((err) => console.log("err", err));
 }
-
 document
   .querySelectorAll(".btn-delete")
   .forEach((item) => item.addEventListener("click", deleteItem));

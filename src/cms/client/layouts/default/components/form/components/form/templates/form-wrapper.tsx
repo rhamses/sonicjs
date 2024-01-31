@@ -1,7 +1,7 @@
 import { AsideWrapper } from "../../aside"
 import { FormWrapper } from "../../../../../interface"
 export default (props: FormWrapper) =>
-  <form method="POST" enctype="multipart/form-data" class="flex rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+  <form id="addnewform" method="POST" enctype="multipart/form-data" class="flex rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
     <section class="flex flex-col gap-5.5 p-6.5 basis-9/12">
       { props.children }
     </section>

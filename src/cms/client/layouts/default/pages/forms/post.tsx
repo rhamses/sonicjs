@@ -10,6 +10,7 @@ export const FormPosts = (props: pageProps) =>
       label="Titulo"
       class="text-lg"
     />
+    <div id="editorjs"></div>
     <FormInput
       id={props?.posttype + "['post_content']"}
       type="textarea"
