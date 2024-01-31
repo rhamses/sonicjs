@@ -18,8 +18,7 @@ export class RouterController extends SetupController {
   }
   private async prepareBody() {
     const body = await this.body;
-    console.log("body1", body["post_thumbnail"]);
-    console.log("body", JSON.stringify(body));
+    // console.log("body", body["posts['post_thumbnail']"]);
     const includeData = {};
     // prepare record
     for (const key of Object.keys(body)) {
@@ -194,6 +193,7 @@ export class RouterController extends SetupController {
         url: "/client/list",
         success: true,
       });
+      return false;
       return this.pageRedirect(url);
     }
   }

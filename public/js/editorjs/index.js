@@ -19,6 +19,7 @@ import "./raw.umd.js";
  */
 let editor;
 const textEditor = document.querySelector("textarea[id*=post_content]");
+const BASE_URL = window.location.host;
 if (textEditor) {
   let data = {};
   const postContent = document.querySelector("textarea[id*=post_content]");
@@ -42,7 +43,7 @@ if (textEditor) {
         config: {
           field: "file",
           endpoints: {
-            byFile: "http://127.0.0.1:8788/v1/bucket",
+            byFile: "//" + BASE_URL + "/v1/bucket?base64return=true",
           },
         },
       },
