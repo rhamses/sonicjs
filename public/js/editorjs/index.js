@@ -18,6 +18,7 @@ import "./raw.umd.js";
  *
  */
 let editor;
+let imageDict = {};
 const textEditor = document.querySelector("textarea[id*=post_content]");
 const BASE_URL = window.location.host;
 if (textEditor) {
@@ -42,8 +43,26 @@ if (textEditor) {
         class: ImageTool,
         config: {
           field: "file",
-          endpoints: {
-            byFile: "//" + BASE_URL + "/v1/bucket?base64return=true",
+          uploader: {
+            uploadByFile(file) {
+              const url = "//" + BASE_URL + "/v1/bucket?method=base64";
+              const body = new FormData();
+              body.append("file", file);
+              return fetch(url, { method: "POST", body })
+                .then((res) => res.json())
+                .then((res) => {
+                  if (res.success === 1) {
+                    imageDict[res.file.key] = res.file.url;
+                  } else {
+                    alert("Upload de imagem falhou");
+                  }
+                  if (location.host.includes("127")) {
+                    res.file.url =
+                      "https://sonicjs-media.amb1.io/_18223c10-f8cf-493d-ae1f-823ede9a5098.jpg";
+                  }
+                  return res;
+                });
+            },
           },
         },
       },
@@ -62,14 +81,20 @@ if (textEditor) {
  * INTERCEPT FORM SUBMIT
  *
  */
-document.querySelector("#addnewform").addEventListener("submit", async (e) => {
-  try {
-    const result = await editor.save();
-    document.querySelector("textarea[id*=post_content]").value =
-      JSON.stringify(result);
-    e.currentTarget.submit();
-  } catch (error) {
-    alert("error");
-    console.log("error", error);
-  }
-});
+if (location.pathname.includes("posts")) {
+  document
+    .querySelector("#addnewform")
+    .addEventListener("submit", async (e) => {
+      console.log("1", 1);
+      try {
+        const result = await editor.save();
+        console.log("asdadsad", JSON.stringify(result));
+        document.querySelector("textarea[id*=post_content]").value =
+          JSON.stringify(result);
+        e.currentTarget.submit();
+      } catch (error) {
+        alert("error");
+        console.log("error", error);
+      }
+    });
+}

@@ -338,6 +338,17 @@ export class WPLike {
     );
     return data;
   }
+  async getPostMetaById(meta: string, postid: string) {
+    const { data } = await getRecords(
+      this.ctx,
+      "postmeta",
+      {
+        post_id: postid,
+      },
+      "postmeta-" + postid + "-list"
+    );
+    return data.find((item) => item.meta_key === meta)?.meta_value;
+  }
   async listRecords(table: string, params: any, id: string) {
     try {
       console.log("+++++", table, params, id);
@@ -353,31 +364,41 @@ export class WPLike {
     }
   }
   async deletePost(postID) {
-    const tables = ["reltermpost", "postmeta", "posts"];
-    for (const table of tables) {
-      if (table != "posts") {
-        // GET REL ENTRIES
-        const { data } = await getRecords(
-          this.ctx,
-          table,
-          { post_id: postID },
-          ""
-        );
-        // AND DELETE IT
-        for (const item of data) {
-          const deleteBody = {
-            id: item.id,
-            table,
-          };
-          await deleteRecord(this.d1Data, this.kvData, deleteBody);
-        }
-      } else {
-        const deleteBody = {
-          id: postID,
-          table,
-        };
-        await deleteRecord(this.d1Data, this.kvData, deleteBody);
-      }
+    // get all categories on reltermpost
+    const { data: terms } = await getRecords(
+      this.ctx,
+      "reltermpost",
+      { post_id: postID },
+      null,
+      ""
+    );
+    // get all meta on postmeta
+    const { data: metas } = await getRecords(
+      this.ctx,
+      "postmeta",
+      { post_id: postID },
+      null,
+      ""
+    );
+    // delete every single categorie entry
+    for (const term of terms) {
+      await deleteRecord(this.d1Data, this.kvData, {
+        table: "reltermpost",
+        id: term.id,
+      });
     }
+    // delete every single postmeta item
+    for (const meta of metas) {
+      await deleteRecord(this.d1Data, this.kvData, {
+        table: "postmeta",
+        id: meta.id,
+      });
+    }
+    // delete posts
+    await deleteRecord(this.d1Data, this.kvData, {
+      table: "posts",
+      id: postID,
+    });
+    return { success: true };
   }
 }

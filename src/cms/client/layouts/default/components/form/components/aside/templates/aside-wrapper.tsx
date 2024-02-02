@@ -7,10 +7,15 @@ export default async (props: AsideWrapper) => {
   let html;
   let htmlTaxonomies = [];
   let taxonomies = []
+  let post_thumbnail;
   const { data: userData }  = props.body
   if (userData?.post_type && userData?.id) { 
     const wp = new WPLike(props.ctx.env.D1DATA, props.ctx.env.KVDATA)
     taxonomies = await wp.listRecords("reltermpost", { post_id: userData?.id }, userData?.id)
+    const thumb_name = await wp.getPostMetaById("_wp_attached_file", userData?.id)
+    if (thumb_name) {
+      post_thumbnail = <img src={ props.ctx.env.BUCKET_CUSTOM_DOMAIN + "/" + thumb_name} />
+    }
     selectData.map(item => {
       if (item.value === userData.post_status) {
         return item["selected"] = true
@@ -52,6 +57,7 @@ export default async (props: AsideWrapper) => {
         title="Imagem em Destaque"
         description="Selecione a imagem em destaque do post"
       >
+        {(post_thumbnail ) ? post_thumbnail: ""}
         <FormInput
           id={props?.posttype + "['post_thumbnail']"}
           type="file"
