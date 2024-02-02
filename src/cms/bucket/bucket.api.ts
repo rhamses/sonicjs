@@ -5,9 +5,9 @@ import {
   bucketDeleteFile,
   BucketFormats,
 } from "./bucket";
+import { Bindings } from "../types/bindings";
 
-const bucketApi = new Hono();
-
+const bucketApi = new Hono<{ Bindings: Bindings }>();
 bucketApi.get("/", async (ctx) => {
   try {
     const key = await ctx.req.query("key");
@@ -48,6 +48,7 @@ bucketApi.post("/", async (ctx) => {
         success: 1,
         file: {
           url: base64,
+          key: result.name,
         },
       };
     }
