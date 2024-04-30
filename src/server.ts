@@ -8,7 +8,7 @@ import { example } from './custom/example';
 import { status } from './cms/api/status';
 import { log } from './cms/util/logger';
 import { tusAPI } from './cms/api/tus';
-
+import { client } from './cms/client/client';
 import { AuthRequest, Session, User } from 'lucia';
 import { initializeLucia } from './cms/auth/lucia';
 
@@ -85,5 +85,6 @@ app.route('/admin', admin);
 app.route('v1/example', example);
 app.route('/status', status);
 app.route('/tus', tusAPI);
+app.route('/client', client);
 
 export default app;
