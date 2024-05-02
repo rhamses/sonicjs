@@ -12,11 +12,24 @@ import {
 import { Input } from './layouts/default/components/Input';
 
 function selectForm(menu) {
-  if (menu == 'category') {
+  if (menu == 'categories') {
     return SmallForm;
   } else {
     return FullForm;
   }
+}
+
+function pageTitle(posttype, menu) {
+  let title;
+  switch (posttype) {
+    case 'jobs':
+      title = 'Trabalhos';
+      break;
+  }
+  if (menu == 'categories') {
+    title = 'Categorias';
+  }
+  return title;
 }
 
 const client = new Hono();
@@ -73,15 +86,17 @@ client.get('/list', async (ctx) => {
       }
     }
   }
+  const title = pageTitle(posttype, menu);
   return ctx.html(
-    List({ ctx, posttype, menu, data: result, title: `List ${posttype}` })
+    List({ ctx, posttype, menu, data: result, title: `Listar ${title}` })
   );
 });
 
 client.get('/add', async (ctx) => {
   const { menu, posttype } = ctx.req.query();
   const Form = selectForm(menu);
-  return ctx.html(Form({ ctx, posttype, menu, title: `Add ${posttype}` }));
+  const title = pageTitle(posttype, menu);
+  return ctx.html(Form({ ctx, posttype, menu, title: `Adicionar ${title}` }));
 });
 client.get('/edit', async (ctx) => {
   const { menu, posttype, id, table } = ctx.req.query();
@@ -104,7 +119,6 @@ client.get('/edit', async (ctx) => {
         `${id}-categories`
       );
       postData['categories'] = postCategories;
-      console.log('===>postCategories', postCategories);
     }
     const Form = selectForm(menu);
     return ctx.html(
@@ -149,7 +163,7 @@ client.post('/add', async (ctx) => {
       content: 'Categoria adicionado com sucesso.'
     };
     switch (menu) {
-      case 'category':
+      case 'categories':
         result = await addCategory(await ctx.req.parseBody(), ctx);
         break;
       case 'posts':
@@ -190,7 +204,7 @@ client.post('/edit', async (ctx) => {
   const { posttype, menu, title, postOrder, content, postid, table } =
     await ctx.req.parseBody();
   try {
-    const dataObj = { table, id: postid, data: {} };
+    const dataObj = { table: menu, id: postid, data: {} };
     const Form = selectForm(menu);
     const feedback = {
       color: 'green',
@@ -199,19 +213,13 @@ client.post('/edit', async (ctx) => {
     if (title) dataObj.data['title'] = title;
     if (content) dataObj.data['content'] = content;
 
-    const result = await updateRecord(ctx.env.D1DATA, ctx.env.KVDATA, dataObj, {
-      data: { id: postid }
-    });
-
-    // if (menu == 'category') {
-    //   result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
-    //     table: 'categories',
-    //     data: {
-    //       title,
-    //       body: content
-    //     }
-    //   });
-    // }
+    const result = await updateRecord(
+      ctx.env.D1DATA,
+      ctx.env.KVDATA,
+      dataObj,
+      null
+    );
+    //
     // options table here
     //
     return ctx.html(
@@ -276,6 +284,10 @@ client.delete('/list', async (ctx) => {
 ///////
 function addCategory(body, ctx) {
   const { title, content } = body;
+  console.log('asdsad', {
+    title,
+    body: content
+  });
   return insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
     table: 'categories',
     data: {

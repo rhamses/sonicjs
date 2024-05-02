@@ -56,7 +56,7 @@ export const Aside = async (props: {
                       checked={categoryExists(cat.id, postCategories)}
                     />
                     <a
-                      href={`/client/edit?menu=category&posttype=${props.posttype}&id=${cat.id}&table=categories`}
+                      href={`/client/edit?menu=categories&posttype=${props.posttype}&id=${cat.id}&table=categories`}
                       class='flex items-center ml-3'
                     >
                       <svg

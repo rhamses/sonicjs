@@ -20,12 +20,13 @@ export const FullForm = (props: {
   }
   function getTags(key, title) {
     try {
-      const { images } = props?.data;
-      const postTags = JSON.parse(props?.data?.tags)
+      const images = props?.data?.images;
+      const postTags = props?.data?.tags
+        ? JSON.parse(props?.data?.tags)
+        : {}
         ? JSON.parse(JSON.parse(props?.data?.tags)[0])
-        : null;
+        : {};
       postTags['images'] = images;
-      console.log('postTags', postTags);
       // Prepare Return
       const item =
         postTags[key] && !Array.isArray(postTags[key])
@@ -127,6 +128,7 @@ export const FullForm = (props: {
               <option value='images'>Imagem</option>
               <option value='videos'>Video</option>
               <option value='fichaTecnica'>Créditos</option>
+              <option value='language'>Idioma</option>
             </select>
           </div>
           <Aside

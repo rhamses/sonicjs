@@ -1,11 +1,19 @@
 import { Grid, h } from 'https://unpkg.com/gridjs?module';
 
 function crEl(name, id, full = 'w-full') {
-  const inputWrapper = document.createElement('input');
-  inputWrapper.type = 'text';
+  let inputWrapper;
+  console.log('id', id);
+  if (id.includes('language')) {
+    // Adicionar opçÕes de INgles e Pt
+    inputWrapper = document.createElement('select');
+    // inputWrapper
+  } else {
+    inputWrapper = document.createElement('input');
+    inputWrapper.type = 'text';
+    inputWrapper.placeholder = 'Chave do conteúdo';
+  }
   inputWrapper.name = name;
   inputWrapper.id = id;
-  inputWrapper.placeholder = 'Chave do conteúdo';
   inputWrapper.classList.add('rounded-lg');
   inputWrapper.classList.add('border');
   inputWrapper.classList.add('border-gray');
@@ -84,6 +92,21 @@ function addBlock(section) {
         return sectionWrapper;
       }
       break;
+    case 'language':
+      if (document.querySelector(`#${sectionName}`)) {
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(crEl(`tags[${section}][]`, `tags[${section}][]`));
+        return '';
+      } else {
+        sectionTitle.innerText = 'Idioma';
+        sectionWrapper.appendChild(sectionTitle);
+        sectionWrapper.appendChild(
+          crEl(`tags[${section}][]`, `tags[${section}][]`)
+        );
+        return sectionWrapper;
+      }
+      break;
   }
 }
 
@@ -123,6 +146,10 @@ if (document.querySelector('input[name=dataField]')) {
       {
         id: 'categories',
         name: 'Categorias'
+      },
+      {
+        id: 'order',
+        name: 'Ordem'
       },
       {
         name: 'Actions',
