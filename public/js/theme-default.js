@@ -6,7 +6,19 @@ function crEl(name, id, full = 'w-full') {
   if (id.includes('language')) {
     // Adicionar opçÕes de INgles e Pt
     inputWrapper = document.createElement('select');
+    const optionPt = document.createElement('option');
+    optionPt.value = 'ptbr';
+    optionPt.innerHTML = 'Portugês';
+    const optionEn = document.createElement('option');
+    optionEn.value = 'enUS';
+    optionEn.innerHTML = 'Inglês';
+    inputWrapper.appendChild(optionPt);
+    inputWrapper.appendChild(optionEn);
     // inputWrapper
+  } else if (id.includes('images')) {
+    inputWrapper = document.createElement('input');
+    inputWrapper.type = 'file';
+    inputWrapper.placeholder = 'Chave do conteúdo';
   } else {
     inputWrapper = document.createElement('input');
     inputWrapper.type = 'text';
@@ -25,7 +37,7 @@ function crEl(name, id, full = 'w-full') {
 function apField(field) {
   console.log('-===>', document.querySelector(`#${sectionWrapper}`));
 }
-function addBlock(section) {
+function addBlock(section, name) {
   const sectionWrapper = document.createElement('section');
   const sectionTitle = document.createElement('h2');
   const sectionName = section + '--wrapper';
@@ -96,18 +108,41 @@ function addBlock(section) {
       if (document.querySelector(`#${sectionName}`)) {
         document
           .querySelector(`#${sectionName}`)
-          .appendChild(crEl(`tags[${section}][]`, `tags[${section}][]`));
+          .appendChild(crEl(`tags[${section}]`, `tags[${section}]`));
         return '';
       } else {
         sectionTitle.innerText = 'Idioma';
         sectionWrapper.appendChild(sectionTitle);
         sectionWrapper.appendChild(
-          crEl(`tags[${section}][]`, `tags[${section}][]`)
+          crEl(`tags[${section}]`, `tags[${section}]`)
+        );
+        return sectionWrapper;
+      }
+      break;
+    default:
+      if (document.querySelector(`#${sectionName}`)) {
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(
+            crEl('tags[' + section + '][]', 'tags[' + section + '][]')
+          );
+        return '';
+      } else {
+        sectionTitle.innerText = name;
+        sectionWrapper.appendChild(sectionTitle);
+        sectionWrapper.appendChild(
+          crEl('tags[' + section + '][]', 'tags[' + section + '][]')
         );
         return sectionWrapper;
       }
       break;
   }
+}
+
+function updateReferences() {
+  document
+    .querySelectorAll("input[name='images[]']")
+    .forEach((item) => (item ? item.addEventListener('change') : null));
 }
 
 document.querySelectorAll("a[href*='delete']").forEach((item) =>
@@ -121,9 +156,13 @@ document.querySelectorAll("a[href*='delete']").forEach((item) =>
 if (document.querySelector('#extraContent')) {
   document.querySelector('#extraContent').addEventListener('change', (e) => {
     if (e.target.value) {
-      const field = addBlock(e.target.value);
+      const field = addBlock(
+        e.target.value,
+        e.target.options[e.target.selectedIndex].text
+      );
       if (field) document.querySelector('#extraContentWrapper').append(field);
       e.target.value = '';
+      updateReferences();
     }
   });
 }
@@ -206,4 +245,23 @@ if (document.querySelector('input[name=dataField]')) {
     pagination: true,
     search: true
   }).render(document.getElementById('table'));
+}
+
+if (document.querySelector('#postImage')) {
+  document.querySelector('#postImage').addEventListener('change', async (e) => {
+    const formdata = new FormData();
+    const url =
+      location.protocol + '//' + location.host + '/v1/bucket?method=tempurl';
+    formdata.append('file', e.target.files[0], e.target.files[0].name);
+    const requestOptions = {
+      method: 'POST',
+      body: formdata,
+      redirect: 'follow'
+    };
+    const imageJson = await fetch(url, requestOptions);
+    const result = await imageJson.json();
+    if (result && result.success) {
+      document.querySelector('#imagePreview').src = result.file.url;
+    }
+  });
 }

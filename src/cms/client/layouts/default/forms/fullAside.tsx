@@ -115,7 +115,23 @@ export const Aside = async (props: {
       {props.hasImage ? (
         <article>
           <h3 class='font-bold text-gray-500'>Imagens em Destaque</h3>
-          <Input type='file' label='' id='postImage' />
+          <img
+            id='imagePreview'
+            src={props?.data?.image ? props.data.image : ''}
+            alt=''
+            class='max-h-60 ml-auto mr-auto'
+          />
+          <Input
+            type='hidden'
+            value={props?.data?.image ? props.data.image : ''}
+            id='postImageAdded'
+          />
+          <Input
+            type='file'
+            label=''
+            value={props?.data?.image ? props.data.image : ''}
+            id='postImage'
+          />
         </article>
       ) : (
         ''

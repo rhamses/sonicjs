@@ -11,6 +11,7 @@ import { tusAPI } from './cms/api/tus';
 import { client } from './cms/client/client';
 import { AuthRequest, Session, User } from 'lucia';
 import { initializeLucia } from './cms/auth/lucia';
+import { bucket } from './cms/bucket/bucket.example';
 
 export type Variables = {
   authRequest: AuthRequest;
@@ -86,5 +87,5 @@ app.route('v1/example', example);
 app.route('/status', status);
 app.route('/tus', tusAPI);
 app.route('/client', client);
-
+app.route('/bucket', bucket);
 export default app;

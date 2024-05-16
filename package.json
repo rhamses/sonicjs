@@ -26,8 +26,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.568.0",
+    "@aws-sdk/s3-request-presigner": "^3.568.0",
     "@cloudflare/workers-types": "^4.20240208.0",
     "@types/jest": "^29.5.12",
+    "base64-arraybuffer": "^1.0.2",
     "drizzle-kit": "^0.20.14",
     "esbuild": "^0.17.18",
     "esbuild-jest": "^0.5.0",

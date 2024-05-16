@@ -14,24 +14,103 @@ export const FullForm = (props: {
   };
   data?: any;
 }) => {
-  console.log('full data', props?.data);
   function getValue(key) {
     return props.data ? props.data[key] : '';
   }
   function getTags(key, title) {
     try {
+      console.log('===>key', key);
       const images = props?.data?.images;
       const postTags = props?.data?.tags
-        ? JSON.parse(props?.data?.tags)
-        : {}
         ? JSON.parse(JSON.parse(props?.data?.tags)[0])
         : {};
       postTags['images'] = images;
       // Prepare Return
-      const item =
+      let item = [];
+      // early return
+      if (!postTags[key] || postTags[key].length == 0) return item;
+      item =
         postTags[key] && !Array.isArray(postTags[key])
           ? [postTags[key]]
           : postTags[key];
+      console.log('===>item11', item);
+      let html;
+      switch (key) {
+        case 'images':
+          item = JSON.parse(item[0]);
+          html = item.map((it) => (
+            <>
+              <img src={it} alt='' />
+              <Input
+                type='hidden'
+                value={it}
+                name={key + '[]'}
+                id={key + '[]'}
+              />
+            </>
+          ));
+          break;
+        case 'language':
+          html = (
+            <select
+              name={'tags[' + key + ']'}
+              id={'tags[' + key + ']'}
+              class='rounded-lg border border-gray p-3 mb-5 w-full'
+            >
+              <option selected={item[0] === 'ptbr' ? true : false} value='ptbr'>
+                Portugês
+              </option>
+              <option selected={item[0] === 'enUS' ? true : false} value='enUS'>
+                Inglês
+              </option>
+            </select>
+          );
+          break;
+        case 'videos':
+          html = item.map((it) => (
+            <>
+              <Input
+                type='text'
+                cssClass='w-full'
+                placeholder='Insira o conteúdo'
+                name={'tags[' + key + '][]'}
+                id={'tags[' + key + '][]'}
+                value={it}
+              />
+            </>
+          ));
+          break;
+        case 'fichaTecnica':
+          html = item.map((it) => {
+            return Object.keys(it).map((itKey: string) => (
+              <>
+                <Input
+                  type='text'
+                  cssClass='w-1/2'
+                  placeholder='Insira o conteúdo'
+                  name={`tags[${key}][${itKey}][]`}
+                  id={`tags[${key}][${itKey}][]`}
+                  value={it[itKey]}
+                />
+              </>
+            ));
+          });
+          break;
+        default:
+          html = item.map((it) => (
+            <>
+              <Input
+                type='text'
+                cssClass='w-full'
+                placeholder='Insira o conteúdo'
+                name={'tags[' + key + '][]'}
+                id={'tags[' + key + '][]'}
+                value={it}
+              />
+            </>
+          ));
+          break;
+      }
       return (
         <>
           <section
@@ -39,34 +118,7 @@ export const FullForm = (props: {
             id={key + '--wrapper'}
           >
             <h2 class='w-full'>{title}</h2>
-            {item.map((it) => {
-              console.log('it', it);
-              let result;
-              if (typeof it === 'object') {
-                result = Object.keys(it).map((itKey: string) => (
-                  <Input
-                    type='text'
-                    cssClass='w-1/2'
-                    placeholder='Insira o conteúdo'
-                    name={`tags[${key}][${itKey}][]`}
-                    id={`tags[${key}][${itKey}][]`}
-                    value={it[itKey]}
-                  />
-                ));
-              } else {
-                result = (
-                  <Input
-                    type='text'
-                    cssClass='w-full'
-                    placeholder='Insira o conteúdo'
-                    name={key + '[]'}
-                    id={key + '[]'}
-                    value={it}
-                  />
-                );
-              }
-              return result;
-            })}
+            {html}
           </section>
         </>
       );
@@ -117,6 +169,8 @@ export const FullForm = (props: {
               {getTags('videos', 'Videos')}
               {getTags('images', 'Imagens')}
               {getTags('fichaTecnica', 'Créditos')}
+              {getTags('language', 'Idioma')}
+              {getTags('socialMedia', 'Social Media')}
             </section>
             <h2>Adicionar seção</h2>
             <select
@@ -129,6 +183,7 @@ export const FullForm = (props: {
               <option value='videos'>Video</option>
               <option value='fichaTecnica'>Créditos</option>
               <option value='language'>Idioma</option>
+              <option value='socialMedia'>Social Media</option>
             </select>
           </div>
           <Aside

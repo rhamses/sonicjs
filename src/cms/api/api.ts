@@ -32,6 +32,8 @@ import {
   getOperationCreateResult
 } from '../auth/auth-helpers';
 
+import { bucketApi } from '../bucket/bucket.api';
+
 const api = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 const tables = apiConfig.filter((tbl) => tbl.table !== 'users');
 tables.forEach((entry) => {
@@ -56,7 +58,7 @@ tables.forEach((entry) => {
     );
 
     if (typeof accessControlResult === 'object') {
-      params.accessControlResult= {...accessControlResult };
+      params.accessControlResult = { ...accessControlResult };
     }
 
     if (!accessControlResult) {
@@ -570,5 +572,7 @@ api.get('/kv/delete-all', async (ctx) => {
   await clearAllKVRecords(ctx.env.KVDATA);
   return ctx.text('ok');
 });
+
+api.route('/bucket', bucketApi);
 
 export { api };

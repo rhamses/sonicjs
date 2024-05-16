@@ -10,6 +10,12 @@ export type Bindings = {
   AUTH_KDF?: 'pbkdf2' | 'scrypt';
   ENVIRONMENT?: 'production' | 'development';
   R2STORAGE?: R2Bucket;
+  R2_BUCKET?: R2Bucket;
+  ACCOUNT_ID?: ACCOUNT_ID;
+  BUCKET_NAME?: BUCKET_NAME;
+  BUCKET_ACCESS_KEY_ID?: BUCKET_ACCESS_KEY_ID;
+  BUCKET_SECRET_ACCESS_KEY?: BUCKET_SECRET_ACCESS_KEY;
+  BUCKET_CUSTOM_DOMAIN?: BUCKET_CUSTOM_DOMAIN;
 };
 
 declare global {

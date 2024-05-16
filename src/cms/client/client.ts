@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { FullForm } from './layouts/default/forms/full';
 import { SmallForm } from './layouts/default/forms/small';
 import { List } from './layouts/default/forms/list';
+import { bucketUploadFile, bucketGetFile } from '../bucket/bucket';
 import {
   deleteRecord,
   getRecords,
@@ -25,6 +26,12 @@ function pageTitle(posttype, menu) {
     case 'jobs':
       title = 'Trabalhos';
       break;
+    case 'quemsomos':
+      title = 'Quem Somos';
+      break;
+    default:
+      title = posttype;
+      break;
   }
   if (menu == 'categories') {
     title = 'Categorias';
@@ -37,7 +44,6 @@ const client = new Hono();
 client.get('/', async (ctx) => {
   return ctx.html(Layout({}));
 });
-
 client.get('/field', async (ctx) => {
   const inpt = Input({
     cssClass: 'w-1/2',
@@ -47,7 +53,6 @@ client.get('/field', async (ctx) => {
   });
   return ctx.json({ field: JSON.stringify(inpt) });
 });
-
 client.get('/list', async (ctx) => {
   const { menu, posttype } = ctx.req.query();
   const { data: postData } = await getRecords(ctx, menu, {}, `${menu}-list`);
@@ -58,9 +63,10 @@ client.get('/list', async (ctx) => {
     `categories-list`
   );
   const result = [];
+  console.log('posttype', posttype);
   if (postData.length > 0) {
     for (const post of postData) {
-      if (post.tags.includes(posttype)) {
+      if (post.tags && post.tags.includes(posttype)) {
         const { data: postCategories } = await getRecords(
           ctx,
           'categoriesToPosts',
@@ -82,6 +88,8 @@ client.get('/list', async (ctx) => {
           )
           .map((postCategory) => postCategory.title)
           .join(', ');
+        // put order on the json
+
         result.push(post);
       }
     }
@@ -121,6 +129,7 @@ client.get('/edit', async (ctx) => {
       postData['categories'] = postCategories;
     }
     const Form = selectForm(menu);
+    console.log('===>postData', postData);
     return ctx.html(
       Form({ ctx, posttype, menu, data: postData, title: `Edit ${posttype}` })
     );
@@ -154,7 +163,6 @@ client.get('/delete', async (ctx) => {
 client.post('/add', async (ctx) => {
   const body = await ctx.req.parseBody();
   const { menu, posttype } = body;
-  console.log('body received =>', body);
   try {
     let result;
     const Form = selectForm(menu);
@@ -167,7 +175,12 @@ client.post('/add', async (ctx) => {
         result = await addCategory(await ctx.req.parseBody(), ctx);
         break;
       case 'posts':
-        result = await addPosts(await ctx.req.parseBody(), ctx);
+        const formatBody = await formatPost(await ctx.req.parseBody(), ctx);
+        console.log('====>formatBody111', formatBody);
+        result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
+          table: menu,
+          data: formatBody
+        });
         const {
           data: { id }
         } = result;
@@ -201,40 +214,14 @@ client.post('/add', async (ctx) => {
   }
 });
 client.post('/edit', async (ctx) => {
-  const { posttype, menu, title, postOrder, content, postid, table } =
-    await ctx.req.parseBody();
-  try {
-    const dataObj = { table: menu, id: postid, data: {} };
-    const Form = selectForm(menu);
-    const feedback = {
-      color: 'green',
-      content: 'Registro atualizado com sucesso.'
-    };
-    if (title) dataObj.data['title'] = title;
-    if (content) dataObj.data['content'] = content;
-
-    const result = await updateRecord(
-      ctx.env.D1DATA,
-      ctx.env.KVDATA,
-      dataObj,
-      null
-    );
-    //
-    // options table here
-    //
-    return ctx.html(
-      Form({ ctx, posttype, menu, feedback, title: `Add ${posttype}` })
-    );
-  } catch (error) {
-    const feedback = {
-      color: 'red',
-      content:
-        'Categoria não foi adicionado. Tente novamente ou entre em contato.'
-    };
-    const Form = selectForm(menu);
-    return ctx.html(
-      Form({ ctx, posttype, feedback, menu, title: 'Add Small Form' })
-    );
+  const menu = ctx.req.query('menu');
+  switch (menu) {
+    case 'posts':
+      return EditPost(ctx);
+      break;
+    case 'categories':
+      return EditPost(ctx);
+      break;
   }
 });
 client.delete('/list', async (ctx) => {
@@ -296,33 +283,65 @@ function addCategory(body, ctx) {
     }
   });
 }
-export const addPosts = async (body, ctx) => {
+
+export const formatPost = async (body, ctx) => {
   const {
     title,
     content,
     tags,
     postImage,
+    postImageAdded,
     posttype,
     menu,
     userId,
     postOrder,
     local
   } = body;
-  const resultTags = { videos: [], order: 0, fichaTecnica: [] };
-  let images = [];
+  console.log('====>body', body);
+  const resultTags = {
+    videos: null,
+    order: 0,
+    fichaTecnica: [],
+    language: null,
+    socialMedia: null
+  };
+  /**
+   * GET POST IMAGE
+   */
+  let image = '';
+  if (!postImage && postImageAdded) {
+    image = postImageAdded;
+  } else if (postImage) {
+    let pI;
+    if (typeof postImage == 'string') {
+      pI = postImage;
+    } else {
+      pI = postImage.name;
+    }
+    image = await bucketGetFile(ctx, pI, 'url');
+  }
   /**
    * GET POST IMAGES
    */
-  if (body['images[]']) {
-    images = body['images[]'];
+  let images = null;
+  if (body['images[]'] && body['images[]'].length > 0) {
+    images = [];
     // upload image
+    for (const img of body['images[]']) {
+      if (typeof img === 'string') {
+        images.push(img);
+      } else {
+        const image = await bucketUploadFile(ctx, img);
+        console.log('===>image', image);
+        const imageUploadUrl = await bucketGetFile(ctx, image.name, 'url');
+        console.log('===>imageUploadUrl', imageUploadUrl);
+        images.push(imageUploadUrl);
+      }
+    }
   }
   /**
    * GET POST TAGS
    */
-  if (body['tags[videos][]']) {
-    resultTags.videos = body['tags[videos][]'];
-  }
   if (posttype) {
     resultTags['posttype'] = posttype;
   }
@@ -331,6 +350,17 @@ export const addPosts = async (body, ctx) => {
   }
   if (Number(postOrder)) {
     resultTags.order = Number(postOrder);
+  }
+  if (body['tags[videos][]']) {
+    resultTags.videos = body['tags[videos][]'];
+  }
+  if (body['tags[language]']) {
+    resultTags.language = body['tags[language]'];
+  }
+  if (body['tags[socialMedia][]']) {
+    resultTags.socialMedia = Array.isArray(body['tags[socialMedia][]'])
+      ? body['tags[socialMedia][]']
+      : [body['tags[socialMedia][]']];
   }
   if (body['tags[fichaTecnica][title][]']) {
     if (Array.isArray(body['tags[fichaTecnica][title][]'])) {
@@ -351,20 +381,18 @@ export const addPosts = async (body, ctx) => {
       });
     }
   }
-  return insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
-    table: 'posts',
-    data: {
-      title,
-      body: content,
-      images,
-      tags: [JSON.stringify(resultTags)],
-      userId
-    }
-  });
+  return {
+    title,
+    body: content,
+    image,
+    images,
+    tags: [JSON.stringify(resultTags)],
+    userId
+  };
 };
 export const addPostsCategory = async (ctx, postId, categories) => {
   let result = [];
-  console.log('===>categories'), categories;
+  console.log('===>categories', categories);
   if (categories) {
     for (const categoryId of categories) {
       const response = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
@@ -378,6 +406,101 @@ export const addPostsCategory = async (ctx, postId, categories) => {
     }
   }
   return result;
+};
+export const getPostCategories = async (ctx, postId) => {
+  // pega todas as categorias do post
+  const { data: postCategories } = await getRecords(
+    ctx,
+    'categoriesToPosts',
+    {
+      filters: {
+        postId: {
+          $eq: postId
+        }
+      }
+    },
+    null,
+    'd1'
+  );
+  console.log('===>postCategories', postCategories);
+  return postCategories;
+};
+export const deletePostCategories = async (ctx, categories) => {
+  try {
+    let result = [];
+    for (const category of categories) {
+      const { id } = category;
+      result.push(
+        await deleteRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
+          table: 'categoriesToPosts',
+          id
+        })
+      );
+    }
+    return result;
+  } catch (error) {
+    console.log('===> error deletePostCategories', error);
+  }
+};
+export const EditCategories = async (ctx) => {
+  const body = await ctx.req.parseBody();
+};
+export const EditPost = async (ctx) => {
+  const body = await ctx.req.parseBody();
+  const posttype = body['posttype'];
+  const menu = body['menu'];
+  const categories = body['category[]']
+    ? Array.isArray(body['category[]'])
+      ? body['category[]']
+      : [body['category[]']]
+    : [];
+  const postID = ctx.req.query('id');
+  try {
+    const formatBody = await formatPost(await ctx.req.parseBody(), ctx);
+    const dataObj = { table: menu, id: postID, data: formatBody };
+    const feedback = {
+      color: 'green',
+      content: 'Registro atualizado com sucesso.'
+    };
+
+    console.log('====>dataObj', dataObj);
+    console.log('====>formatBody', formatBody);
+    console.log('====>categories', categories);
+    // UPDATE RECORD
+    const result = await updateRecord(
+      ctx.env.D1DATA,
+      ctx.env.KVDATA,
+      dataObj,
+      null
+    );
+    // DELETE CATEGORIES ALREADY ADDED
+    const categoriesSelected = await getPostCategories(ctx, postID);
+    const categoriesDeleted = await deletePostCategories(
+      ctx,
+      categoriesSelected
+    );
+    console.log('====>categoriesSelected', categoriesSelected);
+    console.log('====>categoriesDeleted', categoriesDeleted);
+    // GET POST CATEGORIES
+    if (categories.length > 0) {
+      const categoriesAdded = await addPostsCategory(ctx, postID, categories);
+      console.log('====>categories', categories);
+      console.log('====>categoriesAdded', categoriesAdded);
+    }
+    // RETURN STATEMENT
+    return ctx.redirect(`/client/list?menu=${menu}&posttype=${posttype}`);
+  } catch (error) {
+    console.log('===<error', error);
+    const feedback = {
+      color: 'red',
+      content:
+        'Categoria não foi adicionado. Tente novamente ou entre em contato.'
+    };
+    const Form = selectForm(menu);
+    return ctx.html(
+      Form({ ctx, posttype, feedback, menu, title: 'Add Small Form' })
+    );
+  }
 };
 
 export { client };
