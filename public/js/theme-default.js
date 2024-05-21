@@ -1,8 +1,9 @@
 import { Grid, h } from 'https://unpkg.com/gridjs?module';
 
-function crEl(name, id, full = 'w-full') {
-  let inputWrapper;
-  console.log('id', id);
+function crEl(name, id, full = 'w-full', attrs = {}) {
+  let inputWrapper, complWrapper;
+  const { type, placeholder } = attrs;
+  // Start IFs
   if (id.includes('language')) {
     // Adicionar opçÕes de INgles e Pt
     inputWrapper = document.createElement('select');
@@ -19,10 +20,16 @@ function crEl(name, id, full = 'w-full') {
     inputWrapper = document.createElement('input');
     inputWrapper.type = 'file';
     inputWrapper.placeholder = 'Chave do conteúdo';
+  } else if (type == 'checkbox') {
+    complWrapper = document.createElement('span');
+    complWrapper.innerText = placeholder;
+    inputWrapper = document.createElement('input');
+    inputWrapper.type = type ? type : 'text';
+    inputWrapper.placeholder = placeholder ? placeholder : 'Chave do conteúdo';
   } else {
     inputWrapper = document.createElement('input');
-    inputWrapper.type = 'text';
-    inputWrapper.placeholder = 'Chave do conteúdo';
+    inputWrapper.type = type ? type : 'text';
+    inputWrapper.placeholder = placeholder ? placeholder : 'Chave do conteúdo';
   }
   inputWrapper.name = name;
   inputWrapper.id = id;
@@ -32,6 +39,7 @@ function crEl(name, id, full = 'w-full') {
   inputWrapper.classList.add('p-3');
   inputWrapper.classList.add('mb-5');
   inputWrapper.classList.add(full);
+
   return inputWrapper;
 }
 function apField(field) {
@@ -95,7 +103,13 @@ function addBlock(section, name) {
       if (document.querySelector(`#${sectionName}`)) {
         document
           .querySelector(`#${sectionName}`)
-          .appendChild(crEl('tags[videos][]', 'tags[videos][]'));
+          .appendChild(crEl('tags[videos][]', 'tags[videos][]'))
+          .appendChild(
+            crEl('tags[videoHome][]', 'tags[videoHome][]', 'w-auto', {
+              type: 'checkbox',
+              placeholder: 'Adicionar na home?'
+            })
+          );
         return '';
       } else {
         sectionTitle.innerText = 'Videos';
@@ -265,3 +279,19 @@ if (document.querySelector('#postImage')) {
     }
   });
 }
+
+/**
+ * 
+ * 
+ * 
+ function teste(a, b) {
+    var r = []
+    r.push(a)
+    if(b) {
+      r.push(...b)
+    }
+    return r
+  }
+
+  console.log(teste("a", teste("b")))
+ */
