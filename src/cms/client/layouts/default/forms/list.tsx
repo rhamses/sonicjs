@@ -23,10 +23,16 @@ export const List = (props: {
           name='dataField'
           value={JSON.stringify(props.data)}
         />
-        <button class='hide py-2 mb-4 px-4 border rounded-md text-white bg-blue-600'>
+        <button
+          style='visibility: hidden'
+          class='hide py-2 mb-4 px-4 border rounded-md text-white bg-blue-600'
+        >
           teste
         </button>
-        <button class='hide py-2 mb-4 px-4 border rounded-md text-white bg-red-600'>
+        <button
+          style='visibility: hidden'
+          class='hide py-2 mb-4 px-4 border rounded-md text-white bg-red-600'
+        >
           teste
         </button>
       </MainContent>

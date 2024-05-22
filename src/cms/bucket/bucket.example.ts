@@ -1,9 +1,9 @@
-import { Hono } from "hono";
-import { bucketGetFile, bucketUploadFile } from "./bucket";
+import { Hono } from 'hono';
+import { bucketGetFile, bucketUploadFile } from './bucket';
 
 const bucket = new Hono();
 
-bucket.get("/", (ctx) => {
+bucket.get('/', (ctx) => {
   return ctx.html(`
   <h1>Bucket Form Example</h1>
   <form method="POST" enctype="multipart/form-data">
@@ -14,7 +14,7 @@ bucket.get("/", (ctx) => {
   `);
 });
 
-bucket.post("/", async (ctx) => {
+bucket.post('/', async (ctx) => {
   const body = await ctx.req.parseBody();
   const file = body.file as File;
   const result = await bucketUploadFile(ctx.env, file);
@@ -22,7 +22,7 @@ bucket.post("/", async (ctx) => {
   const object = (await bucketGetFile(ctx.env, result.name, null)) as R2Object;
   const headers = new Headers();
   object.writeHttpMetadata(headers);
-  headers.set("etag", object.httpEtag);
+  headers.set('etag', object.httpEtag);
   return ctx.newResponse(object.body, { headers });
 });
 

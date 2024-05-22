@@ -1,20 +1,20 @@
 export enum HeaderList {
-  name = "Nome",
-  user_login = "Login",
-  user_email = "Email",
-  user_status = "Status",
-  post_title = "Título",
-  post_author = "Autor",
-  post_status = "Status",
-  taxonomy = "Taxonomia",
-  description = "Descrição",
-  createdOn = "Created At",
-  updatedOn = "Updated At",
+  name = 'Nome',
+  user_login = 'Login',
+  user_email = 'Email',
+  user_status = 'Status',
+  post_title = 'Título',
+  post_author = 'Autor',
+  post_status = 'Status',
+  taxonomy = 'Taxonomia',
+  description = 'Descrição',
+  createdOn = 'Created At',
+  updatedOn = 'Updated At'
 }
 
 export const getHeaders = (schema) => {
   if (schema.length === 0) {
-    schema = ["createdOn", "updatedOn"];
+    schema = ['createdOn', 'updatedOn'];
   }
   if (Array.isArray(schema)) {
     schema = schema[0];

@@ -324,8 +324,11 @@ export const formatPost = async (body, ctx) => {
    * GET POST IMAGES
    */
   let images = null;
-  if (body['images[]'] && body['images[]'].length > 0) {
+  if (body['images[]']) {
     images = [];
+    if (!Array.isArray(body['images[]'])) {
+      body['images[]'] = [body['images[]']];
+    }
     // upload image
     for (const img of body['images[]']) {
       if (typeof img === 'string') {
@@ -457,6 +460,7 @@ export const EditPost = async (ctx) => {
   const postID = ctx.req.query('id');
   try {
     const formatBody = await formatPost(await ctx.req.parseBody(), ctx);
+    console.log('formatBody', formatBody);
     const dataObj = { table: menu, id: postID, data: formatBody };
     const feedback = {
       color: 'green',
