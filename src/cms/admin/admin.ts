@@ -46,7 +46,7 @@ admin.use('*', async (ctx, next) => {
     (path === '/admin/login' || path === '/admin/content/new/auth/users/setup')
   ) {
     //redirect if logged in
-    return ctx.redirect('/admin', 302);
+    return ctx.redirect('/client', 302);
   }
   await next();
 });

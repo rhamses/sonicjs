@@ -40,7 +40,7 @@ export const FullForm = (props: {
           item = JSON.parse(item[0]);
           html = item.map((it) => (
             <>
-              <img src={it} alt='' />
+              <img class='max-h-60' src={it} alt='' />
               <Input
                 type='hidden'
                 value={it}

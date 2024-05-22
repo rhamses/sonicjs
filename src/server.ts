@@ -57,7 +57,10 @@ app.use(
 
 //request Logging
 app.use('*', async (ctx, next) => {
-  if (ctx.req.path.indexOf('/admin') == 0 || ctx.req.path.indexOf('/v1') == 0) {
+  if (
+    ctx.req.path.indexOf('/client') == 0 ||
+    ctx.req.path.indexOf('/v1') == 0
+  ) {
     log(ctx, { level: 'info', method: ctx.req.method, url: ctx.req.path });
   }
   await next();
@@ -73,7 +76,7 @@ app.onError((err, ctx) => {
 });
 
 app.get('/', async (ctx) => {
-  return ctx.redirect('/admin');
+  return ctx.redirect('/client');
 });
 
 app.get('/public/*', async (ctx) => {

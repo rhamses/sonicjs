@@ -4,6 +4,8 @@ import { FullForm } from './layouts/default/forms/full';
 import { SmallForm } from './layouts/default/forms/small';
 import { List } from './layouts/default/forms/list';
 import { bucketUploadFile, bucketGetFile } from '../bucket/bucket';
+import { apiConfig, config } from '../../db/routes';
+import { hasUser } from '../auth/auth-helpers';
 import {
   deleteRecord,
   getRecords,
@@ -40,6 +42,27 @@ function pageTitle(posttype, menu) {
 }
 
 const client = new Hono();
+
+client.use('*', async (ctx, next) => {
+  const path = ctx.req.path;
+  let canUseAdmin = await config.adminAccessControl(ctx);
+  if (!canUseAdmin) {
+    const userExists = await hasUser(ctx);
+    if (userExists && path !== '/admin/login') {
+      return ctx.redirect('/admin/login', 302);
+    } else if (!userExists && path !== '/admin/content/new/auth/users/setup') {
+      return ctx.redirect('/admin/content/new/auth/users/setup', 302);
+    }
+    //redirect if not logged in
+  } else if (
+    canUseAdmin &&
+    (path === '/admin/login' || path === '/admin/content/new/auth/users/setup')
+  ) {
+    //redirect if logged in
+    return ctx.redirect('/client', 302);
+  }
+  await next();
+});
 
 client.get('/', async (ctx) => {
   return ctx.html(Layout({}));

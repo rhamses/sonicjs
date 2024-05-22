@@ -36,7 +36,7 @@
             console.log(response.statusText);
             console.log(response.headers);
             console.log(response.config);
-            location.href = '/admin';
+            location.href = '/client';
           })
           .catch((error) => {
             document.getElementById('login-errors').innerHTML =
