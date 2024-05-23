@@ -78,7 +78,7 @@ client.get('/field', async (ctx) => {
 });
 client.get('/list', async (ctx) => {
   const { menu, posttype } = ctx.req.query();
-  const { data: postData } = await getRecords(ctx, menu, {}, `${menu}-list`);
+  let { data: postData } = await getRecords(ctx, menu, {}, `${menu}-list`);
   const { data: allCategories } = await getRecords(
     ctx,
     'categories',
@@ -86,38 +86,48 @@ client.get('/list', async (ctx) => {
     `categories-list`
   );
   const result = [];
-  console.log('posttype', posttype);
+  const title = pageTitle(posttype, menu);
+  // Check if postData.length > 0
   if (postData.length > 0) {
-    for (const post of postData) {
-      if (post.tags && post.tags.includes(posttype)) {
-        const { data: postCategories } = await getRecords(
-          ctx,
-          'categoriesToPosts',
-          {
-            filters: {
-              postId: {
-                $eq: post.id
-              }
-            }
-          },
-          `${post.id}-categories`
-        );
-        // get all cat names
-        post['categories'] = postCategories
-          .map((postCategory) =>
-            allCategories.find(
-              (category) => category.id === postCategory.categoryId
-            )
-          )
-          .map((postCategory) => postCategory.title)
-          .join(', ');
-        // put order on the json
-
-        result.push(post);
+    postData = postData.map((item) => {
+      if (item.tags.length) {
+        item.tags = JSON.parse(JSON.parse(item.tags)[0]);
       }
+      return item;
+    });
+    postData = postData
+      .filter((post) => post.tags.posttype == posttype)
+      .map((item) => {
+        return {
+          ...item,
+          ...item['tags']
+        };
+      });
+    for (const post of postData) {
+      const { data: postCategories } = await getRecords(
+        ctx,
+        'categoriesToPosts',
+        {
+          filters: {
+            postId: {
+              $eq: post.id
+            }
+          }
+        },
+        `${post.id}-categories`
+      );
+      // get all cat names
+      post['categories'] = postCategories
+        .map((postCategory) =>
+          allCategories.find(
+            (category) => category.id === postCategory.categoryId
+          )
+        )
+        .map((postCategory) => postCategory.title)
+        .join(', ');
+      result.push(post);
     }
   }
-  const title = pageTitle(posttype, menu);
   return ctx.html(
     List({ ctx, posttype, menu, data: result, title: `Listar ${title}` })
   );

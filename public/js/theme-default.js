@@ -16,6 +16,11 @@ function crEl(name, id, full = 'w-full', attrs = {}) {
     inputWrapper.appendChild(optionPt);
     inputWrapper.appendChild(optionEn);
     // inputWrapper
+  } else if (id.includes('close')) {
+    inputWrapper = document.createElement('button');
+    inputWrapper.type = 'button';
+    inputWrapper.classList.add('bg-red-100');
+    inputWrapper.innerText = 'fechar';
   } else if (id.includes('images')) {
     inputWrapper = document.createElement('input');
     inputWrapper.type = 'file';
@@ -41,9 +46,6 @@ function crEl(name, id, full = 'w-full', attrs = {}) {
   inputWrapper.classList.add(full);
 
   return inputWrapper;
-}
-function apField(field) {
-  console.log('-===>', document.querySelector(`#${sectionWrapper}`));
 }
 function addBlock(section, name) {
   const sectionWrapper = document.createElement('section');
@@ -77,11 +79,15 @@ function addBlock(section, name) {
         inputs.map((input) =>
           document.querySelector(`#${sectionName}`).appendChild(input)
         );
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(crEl('close', 'close'));
         return '';
       } else {
         sectionTitle.innerText = 'Ficha Técnica';
         sectionWrapper.appendChild(sectionTitle);
         inputs.map((input) => sectionWrapper.appendChild(input));
+        sectionWrapper.appendChild(crEl('close', 'close'));
         return sectionWrapper;
       }
       break;
@@ -91,11 +97,15 @@ function addBlock(section, name) {
         document
           .querySelector(`#${sectionName}`)
           .appendChild(crEl(elName, elName));
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(crEl('close', 'close'));
         return '';
       } else {
         sectionTitle.innerText = 'Imagens';
         sectionWrapper.appendChild(sectionTitle);
         sectionWrapper.appendChild(crEl(elName, elName));
+        sectionWrapper.appendChild(crEl('close', 'close'));
         return sectionWrapper;
       }
       break;
@@ -103,18 +113,16 @@ function addBlock(section, name) {
       if (document.querySelector(`#${sectionName}`)) {
         document
           .querySelector(`#${sectionName}`)
-          .appendChild(crEl('tags[videos][]', 'tags[videos][]'))
-          .appendChild(
-            crEl('tags[videoHome][]', 'tags[videoHome][]', 'w-auto', {
-              type: 'checkbox',
-              placeholder: 'Adicionar na home?'
-            })
-          );
+          .appendChild(crEl('tags[videos][]', 'tags[videos][]'));
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(crEl('close', 'close'));
         return '';
       } else {
         sectionTitle.innerText = 'Videos';
         sectionWrapper.appendChild(sectionTitle);
         sectionWrapper.appendChild(crEl('tags[videos][]', 'tags[videos][]'));
+        sectionWrapper.appendChild(crEl('close', 'close'));
         return sectionWrapper;
       }
       break;
@@ -123,6 +131,9 @@ function addBlock(section, name) {
         document
           .querySelector(`#${sectionName}`)
           .appendChild(crEl(`tags[${section}]`, `tags[${section}]`));
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(crEl('close', 'close'));
         return '';
       } else {
         sectionTitle.innerText = 'Idioma';
@@ -140,6 +151,9 @@ function addBlock(section, name) {
           .appendChild(
             crEl('tags[' + section + '][]', 'tags[' + section + '][]')
           );
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(crEl('close', 'close'));
         return '';
       } else {
         sectionTitle.innerText = name;
@@ -147,6 +161,7 @@ function addBlock(section, name) {
         sectionWrapper.appendChild(
           crEl('tags[' + section + '][]', 'tags[' + section + '][]')
         );
+        sectionWrapper.appendChild(crEl('close', 'close'));
         return sectionWrapper;
       }
       break;
@@ -154,11 +169,33 @@ function addBlock(section, name) {
 }
 
 function updateReferences() {
+  // document
+  //   .querySelectorAll("input[name='images[]']")
+  //   .forEach((item) => (item ? item.addEventListener('change') : null));
   document
-    .querySelectorAll("input[name='images[]']")
-    .forEach((item) => (item ? item.addEventListener('change') : null));
+    .querySelectorAll('button[name=close]')
+    .forEach((item) =>
+      item ? item.addEventListener('click', removeItem) : null
+    );
 }
 
+function removeItem(e) {
+  if (e.target.parentElement.children.length <= 3) {
+    e.target.parentElement.remove();
+  } else {
+    e.target.previousSibling.remove();
+    // console.log('asdasd', e.target.previousSibling);
+    if (e.target.previousSibling.name.includes('tag')) {
+      e.target.previousSibling.remove();
+    }
+    e.target.remove();
+  }
+}
+document
+  .querySelectorAll('button[name=close]')
+  .forEach((item) =>
+    item ? item.addEventListener('click', removeItem) : null
+  );
 document.querySelectorAll("a[href*='delete']").forEach((item) =>
   item.addEventListener('click', (e) => {
     if (!confirm('Deseja Apagar o Registro?')) {
@@ -203,6 +240,10 @@ if (document.querySelector('input[name=dataField]')) {
       {
         id: 'order',
         name: 'Ordem'
+      },
+      {
+        id: 'language',
+        name: 'Idioma'
       },
       {
         name: 'Actions',

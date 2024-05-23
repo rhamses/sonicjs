@@ -47,6 +47,14 @@ export const FullForm = (props: {
                 name={key + '[]'}
                 id={key + '[]'}
               />
+              <button
+                type='button'
+                class='bg-red-100 rounded-lg border border-gray p-3 mb-5 w-full'
+                name='close'
+                id='close'
+              >
+                fechar
+              </button>
             </>
           ));
           break;
@@ -77,6 +85,14 @@ export const FullForm = (props: {
                 id={'tags[' + key + '][]'}
                 value={it}
               />
+              <button
+                type='button'
+                class='bg-red-100 rounded-lg border border-gray p-3 mb-5 w-full'
+                name='close'
+                id='close'
+              >
+                fechar
+              </button>
             </>
           ));
           break;
@@ -109,6 +125,16 @@ export const FullForm = (props: {
               />
             </>
           ));
+          html += (
+            <button
+              type='button'
+              class='bg-red-100 rounded-lg border border-gray p-3 mb-5 w-full'
+              name='close'
+              id='close'
+            >
+              fechar
+            </button>
+          );
           break;
       }
       return (
