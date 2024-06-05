@@ -219,83 +219,104 @@ if (document.querySelector('#extraContent')) {
 }
 
 if (document.querySelector('input[name=dataField]')) {
+  const COLUMNS = [
+    {
+      id: 'id',
+      hidden: true
+    },
+    {
+      id: 'nome',
+      name: 'Nome'
+    },
+    {
+      id: 'email',
+      name: 'Email'
+    },
+    {
+      id: 'title',
+      name: 'Título'
+    },
+    {
+      id: 'categories',
+      name: 'Categorias'
+    },
+    {
+      id: 'order',
+      name: 'Ordem'
+    },
+    {
+      id: 'language',
+      name: 'Idioma'
+    },
+    {
+      id: 'createdOn',
+      name: 'Criado em'
+    }
+  ];
+  const ACTIONS = {
+    name: 'Actions',
+    formatter: (cell, row) => {
+      const a = [
+        h(
+          'a',
+          {
+            href: `/client/edit?menu=${URLParams.get(
+              'menu'
+            )}&posttype=${URLParams.get('posttype')}&id=${row.cells[0].data}`,
+            className: 'py-2 mb-4 px-4 border rounded-md text-white bg-blue-600'
+          },
+          'Edit'
+        ),
+        h(
+          'button',
+          {
+            className: 'py-2 mb-4 px-4 border rounded-md text-white bg-red-600',
+            onClick: () =>
+              fetch(
+                '/client/list?id=' +
+                  row.cells[0].data +
+                  '&posttype=' +
+                  new URLSearchParams(document.location.search).get('posttype'),
+                {
+                  method: 'DELETE',
+                  body: JSON.stringify({
+                    title: row.cells[0].data
+                  })
+                }
+              )
+                .then((res) => res.json())
+                .then((res) => {
+                  if (res.success) {
+                    const index = data.findIndex(
+                      (item) => item.id === row.cells[0].data
+                    );
+                    data.splice(index, 1); // Remove the record from the data array
+                    grid.updateConfig({ data: data }); // Update the grid with the modified data array
+                    grid.forceRender(); // Force Grid.js to re-render the table
+                  } else {
+                    throw Error(res);
+                  }
+                })
+                .catch((err) => console.error(err))
+          },
+          'Delete'
+        )
+      ];
+      return a;
+    }
+  };
   const data = JSON.parse(
     document.querySelector('input[name=dataField]').value
   );
+  const columns = Object.keys(data[0]).map(
+    (header) => COLUMNS.filter((col) => col.id == header)[0]
+  );
+  columns.push(ACTIONS);
+  console.log('columns', columns);
+  //
   const URLParams = new URLSearchParams(document.location.search);
   const grid = new Grid({
-    columns: [
-      {
-        id: 'id',
-        hidden: true
-      },
-      {
-        id: 'title',
-        name: 'Título'
-      },
-      {
-        id: 'categories',
-        name: 'Categorias'
-      },
-      {
-        id: 'order',
-        name: 'Ordem'
-      },
-      {
-        id: 'language',
-        name: 'Idioma'
-      },
-      {
-        name: 'Actions',
-        formatter: (cell, row) => {
-          const a = [
-            h(
-              'a',
-              {
-                href: `/client/edit?menu=${URLParams.get(
-                  'menu'
-                )}&posttype=${URLParams.get('posttype')}&id=${
-                  row.cells[0].data
-                }`,
-                className:
-                  'py-2 mb-4 px-4 border rounded-md text-white bg-blue-600'
-              },
-              'Edit'
-            ),
-            h(
-              'button',
-              {
-                className:
-                  'py-2 mb-4 px-4 border rounded-md text-white bg-red-600',
-                onClick: () =>
-                  fetch('/client/list?id=' + row.cells[0].data, {
-                    method: 'DELETE',
-                    body: JSON.stringify({
-                      title: row.cells[0].data
-                    })
-                  })
-                    .then((res) => res.json())
-                    .then((res) => {
-                      if (res.success) {
-                        const index = data.findIndex(
-                          (item) => item.id === row.cells[0].data
-                        );
-                        data.splice(index, 1); // Remove the record from the data array
-                        grid.updateConfig({ data: data }); // Update the grid with the modified data array
-                        grid.forceRender(); // Force Grid.js to re-render the table
-                      } else {
-                        throw Error(res);
-                      }
-                    })
-                    .catch((err) => console.error(err))
-              },
-              'Delete'
-            )
-          ];
-          return a;
-        }
-      }
-    ],
+    columns,
     data: data,
     pagination: true,
     search: true

@@ -172,6 +172,10 @@ export const FullForm = (props: {
       </>
     );
   }
+  let hasBody = true;
+  if (props.posttype == 'options') {
+    hasBody = false;
+  }
   return (
     <Default>
       <MainContent title={props.title}>
@@ -184,6 +188,7 @@ export const FullForm = (props: {
               placeholder='Título da página'
               value={getValue('title')}
             />
+
             <h2>Conteúdo da página</h2>
             <Input
               type='textarea'
@@ -191,6 +196,7 @@ export const FullForm = (props: {
               id='content'
               value={getValue('body')}
             />
+
             <section id='extraContentWrapper'>
               {getTags('videos', 'Videos')}
               {getTags('images', 'Imagens')}

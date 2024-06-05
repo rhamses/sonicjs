@@ -196,6 +196,7 @@ export async function createUser<T extends string>(args: LuciaAPIArgs<T>) {
     delete content.data?.password;
     const id = uuidv4();
     content.data.id = id;
+    console.log('===>content', content);
     const d1Data = prepareD1Data(content.data);
     if (typeof email !== 'string' || !email?.includes('@')) {
       return ctx.text('invalid email', 400);
@@ -206,16 +207,20 @@ export async function createUser<T extends string>(args: LuciaAPIArgs<T>) {
     ) {
       return ctx.text('invalid password', 400);
     }
-
-    const user = await auth.createUser({
-      key: {
-        providerId: 'email',
-        providerUserId: email.toLowerCase(),
-        password // hashed by lucia
-      },
-      attributes: d1Data
-    });
-    return ctx.json({ user });
+    try {
+      const user = await auth.createUser({
+        key: {
+          providerId: 'email',
+          providerUserId: email.toLowerCase(),
+          password // hashed by lucia
+        },
+        attributes: d1Data
+      });
+      console.log('===>user', user);
+      return ctx.json({ user });
+    } catch (error) {
+      console.log('-===>error', error);
+    }
   }
   return new Response('Invalid request', { status: 400 });
 }

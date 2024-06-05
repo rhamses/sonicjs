@@ -2,10 +2,12 @@ import Layout from './layouts/default/index';
 import { Hono } from 'hono';
 import { FullForm } from './layouts/default/forms/full';
 import { SmallForm } from './layouts/default/forms/small';
+import { UserForm } from './layouts/default/forms/user';
 import { List } from './layouts/default/forms/list';
 import { bucketUploadFile, bucketGetFile } from '../bucket/bucket';
 import { apiConfig, config } from '../../db/routes';
 import { hasUser } from '../auth/auth-helpers';
+import { deleteUser, createUser } from '../auth/lucia';
 import {
   deleteRecord,
   getRecords,
@@ -14,9 +16,11 @@ import {
 } from '../data/data';
 import { Input } from './layouts/default/components/Input';
 
-function selectForm(menu) {
+function selectForm(menu, posttype) {
   if (menu == 'categories') {
     return SmallForm;
+  } else if (posttype == 'users') {
+    return UserForm;
   } else {
     return FullForm;
   }
@@ -31,12 +35,23 @@ function pageTitle(posttype, menu) {
     case 'quemsomos':
       title = 'Quem Somos';
       break;
+    case 'users':
+      title = 'Usuários';
+      break;
+    case 'options':
+      title = 'Opções';
+      break;
     default:
       title = posttype;
       break;
   }
-  if (menu == 'categories') {
-    title = 'Categorias';
+  switch (menu) {
+    case 'categories':
+      title = 'Categorias';
+      break;
+    default:
+      title = posttype;
+      break;
   }
   return title;
 }
@@ -78,54 +93,72 @@ client.get('/field', async (ctx) => {
 });
 client.get('/list', async (ctx) => {
   const { menu, posttype } = ctx.req.query();
-  let { data: postData } = await getRecords(ctx, menu, {}, `${menu}-list`);
-  const { data: allCategories } = await getRecords(
-    ctx,
-    'categories',
-    {},
-    `categories-list`
-  );
   const result = [];
   const title = pageTitle(posttype, menu);
-  // Check if postData.length > 0
-  if (postData.length > 0) {
-    postData = postData.map((item) => {
-      if (item.tags.length) {
-        item.tags = JSON.parse(JSON.parse(item.tags)[0]);
-      }
-      return item;
-    });
-    postData = postData
-      .filter((post) => post.tags.posttype == posttype)
-      .map((item) => {
-        return {
-          ...item,
-          ...item['tags']
-        };
+  if (posttype != 'users') {
+    let { data: postData } = await getRecords(ctx, menu, {}, `${menu}-list`);
+    const { data: allCategories } = await getRecords(
+      ctx,
+      'categories',
+      {},
+      `categories-list`
+    );
+    if (postData.length > 0) {
+      postData = postData.map((item) => {
+        if (item.tags.length) {
+          item.tags = JSON.parse(JSON.parse(item.tags)[0]);
+        }
+        return item;
       });
-    for (const post of postData) {
-      const { data: postCategories } = await getRecords(
-        ctx,
-        'categoriesToPosts',
-        {
-          filters: {
-            postId: {
-              $eq: post.id
+      postData = postData
+        .filter((post) => post.tags.posttype == posttype)
+        .map((item) => {
+          return {
+            ...item,
+            ...item['tags']
+          };
+        });
+      for (const post of postData) {
+        const { data: postCategories } = await getRecords(
+          ctx,
+          'categoriesToPosts',
+          {
+            filters: {
+              postId: {
+                $eq: post.id
+              }
             }
-          }
-        },
-        `${post.id}-categories`
-      );
-      // get all cat names
-      post['categories'] = postCategories
-        .map((postCategory) =>
-          allCategories.find(
-            (category) => category.id === postCategory.categoryId
+          },
+          `${post.id}-categories`
+        );
+        // get all cat names
+        post['categories'] = postCategories
+          .map((postCategory) =>
+            allCategories.find(
+              (category) => category.id === postCategory.categoryId
+            )
           )
-        )
-        .map((postCategory) => postCategory.title)
-        .join(', ');
-      result.push(post);
+          .map((postCategory) => postCategory.title)
+          .join(', ');
+        result.push(post);
+      }
+    }
+  } else {
+    let { data: postData } = await getRecords(
+      ctx,
+      posttype,
+      {},
+      `${posttype}-list`
+    );
+    if (postData.length > 0) {
+      postData.forEach((post) => {
+        result.push({
+          id: post.id,
+          nome: post.firstName,
+          email: post.email,
+          createdOn: post.createdOn
+        });
+      });
     }
   }
   return ctx.html(
@@ -135,7 +168,7 @@ client.get('/list', async (ctx) => {
 
 client.get('/add', async (ctx) => {
   const { menu, posttype } = ctx.req.query();
-  const Form = selectForm(menu);
+  const Form = selectForm(menu, posttype);
   const title = pageTitle(posttype, menu);
   return ctx.html(Form({ ctx, posttype, menu, title: `Adicionar ${title}` }));
 });
@@ -208,24 +241,33 @@ client.post('/add', async (ctx) => {
         result = await addCategory(await ctx.req.parseBody(), ctx);
         break;
       case 'posts':
-        const formatBody = await formatPost(await ctx.req.parseBody(), ctx);
-        console.log('====>formatBody111', formatBody);
-        result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
-          table: menu,
-          data: formatBody
-        });
-        const {
-          data: { id }
-        } = result;
-        if (id) {
-          const categories = !Array.isArray(body['category[]'])
-            ? [body['category[]']]
-            : body['category[]'];
-          result['resultCategory'] = await addPostsCategory(
-            ctx,
-            id,
-            categories
-          );
+        let table;
+        let formatBody;
+        if (posttype == 'users') {
+          body.table = posttype;
+          const result = await createUser({ ctx, content: { data: body } });
+          console.log('result', result);
+        } else {
+          table = menu;
+          formatBody = await formatPost(body, ctx);
+          console.log('====>formatBody111', formatBody);
+          result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
+            table,
+            data: formatBody
+          });
+          const {
+            data: { id }
+          } = result;
+          if (id) {
+            const categories = !Array.isArray(body['category[]'])
+              ? [body['category[]']]
+              : body['category[]'];
+            result['resultCategory'] = await addPostsCategory(
+              ctx,
+              id,
+              categories
+            );
+          }
         }
         break;
     }
@@ -260,40 +302,45 @@ client.post('/edit', async (ctx) => {
 client.delete('/list', async (ctx) => {
   try {
     const id = ctx.req.query('id');
+    const posttype = ctx.req.query('posttype');
     if (id) {
-      // pega post by id
-      const { data: post } = await getRecords(
-        ctx,
-        'posts',
-        { id },
-        `${id}-list`
-      );
-      // pega todas as categorias do post
-      const { data: postCategories } = await getRecords(
-        ctx,
-        'categoriesToPosts',
-        {
-          filters: {
-            postId: {
-              $eq: post?.id
+      if (posttype && posttype == 'users') {
+        const result = await deleteUser({ ctx }, id);
+      } else {
+        // pega post by id
+        const { data: post } = await getRecords(
+          ctx,
+          'posts',
+          { id },
+          `${id}-list`
+        );
+        // pega todas as categorias do post
+        const { data: postCategories } = await getRecords(
+          ctx,
+          'categoriesToPosts',
+          {
+            filters: {
+              postId: {
+                $eq: post?.id
+              }
             }
-          }
-        },
-        null,
-        'd1'
-      );
-      // deleta categorias por post
-      for (const item of postCategories) {
+          },
+          null,
+          'd1'
+        );
+        // deleta categorias por post
+        for (const item of postCategories) {
+          await deleteRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
+            table: 'categoriesToPosts',
+            id: item?.id
+          });
+        }
+        // deleta post
         await deleteRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
-          table: 'categoriesToPosts',
-          id: item?.id
+          table: 'posts',
+          id: post?.id
         });
       }
-      // deleta post
-      await deleteRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
-        table: 'posts',
-        id: post?.id
-      });
     }
     return ctx.json({ success: 1 });
   } catch (error) {

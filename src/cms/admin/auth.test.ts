@@ -68,21 +68,4 @@ describe('admin should be restricted', () => {
     let userResponse = await res.json();
     expect(userResponse.data.id).toBe(user.id);
   });
-
-  // it('admin can see all user records', async () => {
-  //   const user = await createUserAndGetToken(app, ctx);
-  //   // const user2 = await createUserAndGetToken(app, ctx, 'b@b.com', 'password', 'editor');
-
-  //   let req = new Request(`http://localhost/v1/auth/users/`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       Authorization: `Bearer ${user.token}`
-  //     }
-  //   });
-  //   let res = await app.fetch(req, ctx.env);
-  //   expect(res.status).toBe(200);
-  //   let usersResponse = await res.json();
-  //   expect(usersResponse.data.length).toBe(1);
-  // });
 });
