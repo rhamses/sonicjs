@@ -6,7 +6,7 @@ import * as users from './users';
 import * as categoriesToPosts from './categoriesToPosts';
 import * as comments from './comments';
 import { ApiConfig } from '../routes';
-import { isAdmin, isAdminOrEditor } from '../config-helpers';
+import { isAdmin, isAdminOrEditor, slugify } from '../config-helpers';
 
 export const tableName = 'posts';
 
@@ -15,6 +15,7 @@ export const route = 'posts';
 export const definition = {
   id: text('id').primaryKey(),
   title: text('title'),
+  slug: text('slug'),
   body: text('body'),
   userId: text('userId'),
   image: text('image'),
@@ -91,14 +92,22 @@ export const access: ApiConfig['access'] = {
 export const hooks: ApiConfig['hooks'] = {
   resolveInput: {
     create: (ctx, data) => {
+      console.log('===>data', data);
       if (ctx.get('user')?.userId) {
         data.userId = ctx.get('user').userId;
+      }
+      if (data.title) {
+        data.slug = slugify(data.title);
       }
       return data;
     },
     update: (ctx, id, data) => {
+      console.log('===>data', data);
       if (ctx.get('user')?.userId) {
         data.userId = ctx.get('user').userId;
+      }
+      if (data.title) {
+        data.slug = slugify(data.title);
       }
       return data;
     }

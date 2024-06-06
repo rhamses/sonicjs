@@ -105,13 +105,13 @@ client.get('/list', async (ctx) => {
     );
     if (postData.length > 0) {
       postData = postData.map((item) => {
-        if (item.tags.length) {
+        if (item.tags && item.tags.length > 0) {
           item.tags = JSON.parse(JSON.parse(item.tags)[0]);
         }
         return item;
       });
       postData = postData
-        .filter((post) => post.tags.posttype == posttype)
+        .filter((post) => (post.tags ? post.tags.posttype == posttype : null))
         .map((item) => {
           return {
             ...item,
@@ -241,19 +241,23 @@ client.post('/add', async (ctx) => {
         result = await addCategory(await ctx.req.parseBody(), ctx);
         break;
       case 'posts':
-        let table;
         let formatBody;
         if (posttype == 'users') {
           body.table = posttype;
           const result = await createUser({ ctx, content: { data: body } });
           console.log('result', result);
         } else {
-          table = menu;
+          // format body
           formatBody = await formatPost(body, ctx);
-          console.log('====>formatBody111', formatBody);
+          // create hook
+          const { resolveInput } = apiConfig.find(
+            (entry) => entry.route === menu
+          ).hooks;
+          const data = resolveInput.create(ctx, formatBody);
+          // insert data
           result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
-            table,
-            data: formatBody
+            menu,
+            data
           });
           const {
             data: { id }
@@ -539,17 +543,18 @@ export const EditPost = async (ctx) => {
     : [];
   const postID = ctx.req.query('id');
   try {
-    const formatBody = await formatPost(await ctx.req.parseBody(), ctx);
-    console.log('formatBody', formatBody);
-    const dataObj = { table: menu, id: postID, data: formatBody };
     const feedback = {
       color: 'green',
       content: 'Registro atualizado com sucesso.'
     };
-
-    console.log('====>dataObj', dataObj);
-    console.log('====>formatBody', formatBody);
-    console.log('====>categories', categories);
+    // FORMAT BODY
+    const formatBody = await formatPost(await ctx.req.parseBody(), ctx);
+    const dataObj = { table: menu, id: postID, data: formatBody };
+    // CREATE HOOK
+    const { resolveInput } = apiConfig.find(
+      (entry) => entry.route === menu
+    ).hooks;
+    dataObj.data = resolveInput.update(ctx, postID, dataObj.data);
     // UPDATE RECORD
     const result = await updateRecord(
       ctx.env.D1DATA,
@@ -563,13 +568,9 @@ export const EditPost = async (ctx) => {
       ctx,
       categoriesSelected
     );
-    console.log('====>categoriesSelected', categoriesSelected);
-    console.log('====>categoriesDeleted', categoriesDeleted);
     // GET POST CATEGORIES
     if (categories.length > 0) {
       const categoriesAdded = await addPostsCategory(ctx, postID, categories);
-      console.log('====>categories', categories);
-      console.log('====>categoriesAdded', categoriesAdded);
     }
     // RETURN STATEMENT
     return ctx.redirect(`/client/list?menu=${menu}&posttype=${posttype}`);
