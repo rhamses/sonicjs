@@ -93,10 +93,18 @@ client.get('/field', async (ctx) => {
 });
 client.get('/list', async (ctx) => {
   const { menu, posttype } = ctx.req.query();
-  const result = [];
+  let result = [];
   const title = pageTitle(posttype, menu);
   if (posttype != 'users') {
-    let { data: postData } = await getRecords(ctx, menu, {}, `${menu}-list`);
+    let { data: postData } = await getRecords(
+      ctx,
+      menu,
+      {
+        sortBy: 'createdOn',
+        sortDirection: 'desc'
+      },
+      `${menu}-list`
+    );
     const { data: allCategories } = await getRecords(
       ctx,
       'categories',
@@ -161,6 +169,24 @@ client.get('/list', async (ctx) => {
       });
     }
   }
+  // format date
+  // result = result.filter(
+  //   (item) =>
+  //     (item.createdOn = `${String(new Date(item.createdOn).getDate()).padStart(
+  //       2,
+  //       '0'
+  //     )}/${String(new Date(item.createdOn).getMonth() + 1).padStart(
+  //       2,
+  //       '0'
+  //     )}/${new Date(item.createdOn).getFullYear()}
+  //     ${String(new Date(item.createdOn).getHours()).padStart(2, '0')}:${String(
+  //       new Date(item.createdOn).getMinutes()
+  //     ).padStart(2, '0')}:${String(
+  //       new Date(item.createdOn).getSeconds()
+  //     ).padStart(2, '0')}`)
+  // );
+  // re order by order
+  result = result.sort((a, b) => b?.tags?.order - a?.tags?.order);
   return ctx.html(
     List({ ctx, posttype, menu, data: result, title: `Listar ${title}` })
   );
@@ -250,14 +276,14 @@ client.post('/add', async (ctx) => {
           // format body
           formatBody = await formatPost(body, ctx);
           // create hook
-          const { resolveInput } = apiConfig.find(
-            (entry) => entry.route === menu
-          ).hooks;
-          const data = resolveInput.create(ctx, formatBody);
+          // const { resolveInput } = apiConfig.find(
+          //   (entry) => entry.route === menu
+          // ).hooks;
+          // const data = resolveInput.create(ctx, formatBody);
           // insert data
           result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
-            menu,
-            data
+            table: menu,
+            data: formatBody
           });
           const {
             data: { id }

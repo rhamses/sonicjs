@@ -1,0 +1,41 @@
+compatibility_date = "2024-02-03"
+name = "sonicjs"
+workers_dev = true
+main = "src/server.ts"
+
+# Enter your account id
+# This can be found at https://dash.cloudflare.com/ --> Workers & Pages
+#  --> Overview, then in the right sidebar
+account_id = "182788b23836a15ba32a69d616ba1db1"
+
+# Run the `wrangler kv:namespace create sonicjs` command and copy the id below
+# Run the `wrangler kv:namespace create sonicjs --preview` command and copy the preview_id below
+# Only update the preview_id and id, leave the binding name as "KVDATA"
+kv_namespaces = [
+  { binding = "KVDATA", preview_id="24ca3df0af3b4be8b2b43ea7f1f61138", id = "62ccc9984d3d431f9e2c65b1910547ba" }
+]
+# This is a production environment
+[env.production]
+d1_databases = [
+    { binding = "D1DATA", database_name = "farramedia", database_id = "66818b1a-46bd-40f7-9ddd-4ccff677055d" },
+]
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "farramedia"
+
+# This is a staging environment
+[env.staging]
+d1_databases = [
+    { binding = "D1DATA", database_name = "farramedia-hml", database_id = "a3af114d-f1da-4e51-a99b-e04bc1571571" },
+]
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "farramedia-hml"
+
+# Env Vars
+[vars]
+ACCOUNT_ID = "e94a2dcc138e0d8cb51a991dc40fdbb7"
+BUCKET_NAME = "sonicjs"
+BUCKET_ACCESS_KEY_ID = "2fbd67d603247fa89511ffcecdf1b83e"
+BUCKET_SECRET_ACCESS_KEY = "d1e3a8be65c70d7f5078c78c1ac8d1137ba32ed7896fbbbe33acd166067e31cf"
+BUCKET_CUSTOM_DOMAIN = "https://sonicjs-media.amb1.io"
