@@ -154,7 +154,7 @@ client.get('/list', async (ctx) => {
   } else {
     let { data: postData } = await getRecords(
       ctx,
-      posttype,
+      menu,
       {},
       `${posttype}-list`
     );
@@ -170,21 +170,21 @@ client.get('/list', async (ctx) => {
     }
   }
   // format date
-  // result = result.filter(
-  //   (item) =>
-  //     (item.createdOn = `${String(new Date(item.createdOn).getDate()).padStart(
-  //       2,
-  //       '0'
-  //     )}/${String(new Date(item.createdOn).getMonth() + 1).padStart(
-  //       2,
-  //       '0'
-  //     )}/${new Date(item.createdOn).getFullYear()}
-  //     ${String(new Date(item.createdOn).getHours()).padStart(2, '0')}:${String(
-  //       new Date(item.createdOn).getMinutes()
-  //     ).padStart(2, '0')}:${String(
-  //       new Date(item.createdOn).getSeconds()
-  //     ).padStart(2, '0')}`)
-  // );
+  result = result.filter(
+    (item) =>
+      (item.createdOn = `${String(new Date(item.createdOn).getDate()).padStart(
+        2,
+        '0'
+      )}/${String(new Date(item.createdOn).getMonth() + 1).padStart(
+        2,
+        '0'
+      )}/${new Date(item.createdOn).getFullYear()}
+      ${String(new Date(item.createdOn).getHours()).padStart(2, '0')}:${String(
+        new Date(item.createdOn).getMinutes()
+      ).padStart(2, '0')}:${String(
+        new Date(item.createdOn).getSeconds()
+      ).padStart(2, '0')}`)
+  );
   // re order by order
   result = result.sort((a, b) => b?.tags?.order - a?.tags?.order);
   return ctx.html(

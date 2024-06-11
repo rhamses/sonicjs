@@ -7,8 +7,8 @@
     "dev": "run-p dev:*",
     "dev:wrangler": "wrangler pages dev dist --env development --port 8786",
     "dev:esbuild": "node ./src/cms/util/watch.mjs",
-    "bkp-dev:esbuild": "node ./src/cms/util/build.mjs",
     "dev:tailwind": "tailwindcss -i ./src/index.css -o ./public/css/tailwind.css --watch",
+    "bkp-dev:esbuild": "node ./src/cms/util/build.mjs",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
     "test": "jest --verbose",
@@ -40,7 +40,7 @@
     "prettier": "^3.0.3",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.0.4",
-    "wrangler": "^3.25.0"
+    "wrangler": "^3.45.0"
   },
   "dependencies": {
     "@lucia-auth/adapter-sqlite": "^2.0.0",
@@ -57,6 +57,7 @@
     "gridjs": "^6.2.0",
     "gridjs-react": "^6.0.1",
     "hono": "^3.11.7",
+    "install": "^0.13.0",
     "jest": "^29.5.0",
     "jest-environment-miniflare": "^2.14.0",
     "lokijs": "^1.5.12",
