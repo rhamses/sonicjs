@@ -275,26 +275,28 @@ if (document.querySelector('input[name=host]')) {
           {
             style: 'line-height: normal',
             className: 'py-2 mb-4 px-4 border rounded-md text-white bg-red-600',
-            onClick: () =>
-              fetch(
-                '/client/list?id=' +
-                  row.cells[0].data +
-                  '&posttype=' +
-                  new URLSearchParams(document.location.search).get('posttype'),
-                {
-                  method: 'DELETE',
-                  body: JSON.stringify({
-                    title: row.cells[0].data
-                  })
-                }
-              )
-                .then((res) => res.json())
-                .then((res) => {
-                  if (confirm('Deseja remover o registro?')) {
-                    location.reload();
+            onClick: () => {
+              if (confirm('Deseja remover o registro?'))
+                fetch(
+                  '/client/list?id=' +
+                    row.cells[0].data +
+                    '&posttype=' +
+                    new URLSearchParams(document.location.search).get(
+                      'posttype'
+                    ),
+                  {
+                    method: 'DELETE',
+                    body: JSON.stringify({
+                      title: row.cells[0].data
+                    })
                   }
-                })
-                .catch((err) => console.error(err))
+                )
+                  .then((res) => res.json())
+                  .then((res) => {
+                    location.reload();
+                  })
+                  .catch((err) => console.error(err));
+            }
           },
           'Apagar'
         ),
