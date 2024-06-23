@@ -230,6 +230,7 @@ if (document.querySelector('#extraContent')) {
 }
 
 if (document.querySelector('input[name=host]')) {
+  const data = document.querySelector('input[name=host]').value;
   const COLUMNS = [
     {
       id: 'id',
@@ -254,7 +255,7 @@ if (document.querySelector('input[name=host]')) {
   ];
   const ACTIONS = {
     name: 'Action',
-    width: '200px',
+    width: '300px',
     formatter: (cell, row) => {
       const a = [
         h(
@@ -267,7 +268,7 @@ if (document.querySelector('input[name=host]')) {
               'py-2 mb-4 px-4 border rounded-md text-white bg-blue-600',
             style: 'line-height: normal'
           },
-          'Edit'
+          'Editar'
         ),
         h(
           'button',
@@ -289,26 +290,42 @@ if (document.querySelector('input[name=host]')) {
               )
                 .then((res) => res.json())
                 .then((res) => {
-                  if (res.success) {
-                    const index = data.findIndex(
-                      (item) => item.id === row.cells[0].data
-                    );
-                    data.splice(index, 1); // Remove the record from the data array
-                    grid.updateConfig({ data: data }); // Update the grid with the modified data array
-                    grid.forceRender(); // Force Grid.js to re-render the table
-                  } else {
-                    throw Error(res);
+                  if (confirm('Deseja remover o registro?')) {
+                    location.reload();
                   }
                 })
                 .catch((err) => console.error(err))
           },
-          'Delete'
+          'Apagar'
+        ),
+        h(
+          'button',
+          {
+            style: 'line-height: normal',
+            className:
+              'py-2 mb-4 px-4 border rounded-md text-white bg-green-600',
+            onClick: () => {
+              console.log('row', row);
+              fetch('/v1/post-duplicate', {
+                method: 'POST',
+                body: JSON.stringify({
+                  id: row.cells[0].data,
+                  posttype: URLParams.get('posttype')
+                })
+              })
+                .then((res) => res.json())
+                .then((res) => {
+                  location.reload();
+                })
+                .catch((err) => console.error(err));
+            }
+          },
+          'Duplicar'
         )
       ];
       return a;
     }
   };
-  const data = document.querySelector('input[name=host]').value;
   const columns = COLUMNS;
   columns.push(ACTIONS);
   //
@@ -317,8 +334,8 @@ if (document.querySelector('input[name=host]')) {
     columns,
     server: {
       url: `${window.location.protocol}//${window.location.host}/v1/posts-data?${data}`,
-      then: (posts) =>
-        posts.data.map((post) => {
+      then: (posts) => {
+        const result = posts.data.map((post) => {
           const {
             id,
             nome,
@@ -339,7 +356,9 @@ if (document.querySelector('input[name=host]')) {
           if (language) result.push(language);
           if (createdOn) result.push(createdOn);
           return result;
-        })
+        });
+        return result;
+      }
     },
     pagination: true,
     search: true
@@ -364,19 +383,3 @@ if (document.querySelector('#postImage')) {
     }
   });
 }
-
-/**
- * 
- * 
- * 
- function teste(a, b) {
-    var r = []
-    r.push(a)
-    if(b) {
-      r.push(...b)
-    }
-    return r
-  }
-
-  console.log(teste("a", teste("b")))
- */

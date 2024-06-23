@@ -374,7 +374,15 @@ tables.forEach((entry) => {
 
 api.get('/posts-data', async (ctx) => {
   const { menu, posttype } = ctx.req.queries();
-  const posts = await getRecords(ctx, 'posts', {}, 'api-' + posttype);
+  const posts = await getRecords(
+    ctx,
+    'posts',
+    {
+      sortBy: 'createdOn',
+      sortDirection: 'desc'
+    },
+    'api-' + posttype
+  );
   let data = posts.data.filter((post) => post.tags.includes(posttype));
   data = data.map((post) => {
     const { id, nome, email, title, categories, order, language, createdOn } =
@@ -408,6 +416,51 @@ api.get('/posts-data', async (ctx) => {
     source: posts.source,
     total: data.length
   };
+  return ctx.json(result);
+});
+
+api.post('/post-duplicate', async (ctx) => {
+  const { id, posttype } = await ctx.req.json();
+  if (!id) return ctx.json({ result: 0 });
+  // get post
+  let post = await getRecords(ctx, 'posts', { id }, `post-${id}`);
+  post = post.data;
+  delete post?.id;
+  delete post?.createdOn;
+  post.tags = JSON.parse(post.tags);
+  const newPost = {
+    table: 'posts',
+    data: post
+  };
+  const result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, newPost);
+  // Check
+  if (result?.data && posttype == 'jobs') {
+    const categoriesToPosts = await getRecords(
+      ctx,
+      'categoriesToPosts',
+      {
+        filters: {
+          postId: {
+            $eq: id
+          }
+        }
+      },
+      `categoriesToPosts-${id}`
+    );
+    const newCategories = categoriesToPosts.data.map((item) => {
+      const { categoryId } = item;
+      return {
+        categoryId,
+        postId: result.data.id
+      };
+    });
+    for (const newCategory of newCategories) {
+      await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
+        table: 'categoriesToPosts',
+        data: newCategory
+      });
+    }
+  }
   return ctx.json(result);
 });
 

@@ -27,13 +27,7 @@ export const List = (props: {
         />
         <button
           style='visibility: hidden'
-          class='hide py-2 mb-4 px-4 border rounded-md text-white bg-blue-600'
-        >
-          teste
-        </button>
-        <button
-          style='visibility: hidden'
-          class='hide py-2 mb-4 px-4 border rounded-md text-white bg-red-600'
+          class='hide py-2 mb-4 px-4 border rounded-md text-white bg-blue-600 bg-red-600 bg-green-600'
         >
           teste
         </button>
