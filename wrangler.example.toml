@@ -17,7 +17,6 @@ kv_namespaces = [
 
 # Run the `wrangler d1 create sonicjs` command and copy the id below
 [[d1_databases]]
-binding_homol = "__D1_BETA__D1DATA"
 binding = "D1DATA"
 database_name = "sonicjs"
 database_id = "ad304912-a9de-4712-ab8a-53c856e8a2ef"

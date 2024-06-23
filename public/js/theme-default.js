@@ -182,7 +182,6 @@ function addBlock(section, name) {
       break;
   }
 }
-
 function updateReferences() {
   document
     .querySelectorAll('button[name=close]')
@@ -190,7 +189,6 @@ function updateReferences() {
       item ? item.addEventListener('click', removeItem) : null
     );
 }
-
 function removeItem(e) {
   if (e.target.parentElement.children.length <= 3) {
     e.target.parentElement.remove();
@@ -203,6 +201,7 @@ function removeItem(e) {
     e.target.remove();
   }
 }
+
 document
   .querySelectorAll('button[name=close]')
   .forEach((item) =>
@@ -230,27 +229,15 @@ if (document.querySelector('#extraContent')) {
   });
 }
 
-if (document.querySelector('input[name=dataField]')) {
+if (document.querySelector('input[name=host]')) {
   const COLUMNS = [
     {
       id: 'id',
       hidden: true
     },
     {
-      id: 'nome',
-      name: 'Nome'
-    },
-    {
-      id: 'email',
-      name: 'Email'
-    },
-    {
       id: 'title',
       name: 'Título'
-    },
-    {
-      id: 'categories',
-      name: 'Categorias'
     },
     {
       id: 'order',
@@ -266,7 +253,8 @@ if (document.querySelector('input[name=dataField]')) {
     }
   ];
   const ACTIONS = {
-    name: 'Actions',
+    name: 'Action',
+    width: '200px',
     formatter: (cell, row) => {
       const a = [
         h(
@@ -275,13 +263,16 @@ if (document.querySelector('input[name=dataField]')) {
             href: `/client/edit?menu=${URLParams.get(
               'menu'
             )}&posttype=${URLParams.get('posttype')}&id=${row.cells[0].data}`,
-            className: 'py-2 mb-4 px-4 border rounded-md text-white bg-blue-600'
+            className:
+              'py-2 mb-4 px-4 border rounded-md text-white bg-blue-600',
+            style: 'line-height: normal'
           },
           'Edit'
         ),
         h(
           'button',
           {
+            style: 'line-height: normal',
             className: 'py-2 mb-4 px-4 border rounded-md text-white bg-red-600',
             onClick: () =>
               fetch(
@@ -317,19 +308,39 @@ if (document.querySelector('input[name=dataField]')) {
       return a;
     }
   };
-  const data = JSON.parse(
-    document.querySelector('input[name=dataField]').value
-  );
-  const columns = Object.keys(data[0]).map(
-    (header) => COLUMNS.filter((col) => col.id == header)[0]
-  );
+  const data = document.querySelector('input[name=host]').value;
+  const columns = COLUMNS;
   columns.push(ACTIONS);
-  console.log('columns', columns);
   //
   const URLParams = new URLSearchParams(document.location.search);
   const grid = new Grid({
     columns,
-    data: data,
+    server: {
+      url: `${window.location.protocol}//${window.location.host}/v1/posts-data?${data}`,
+      then: (posts) =>
+        posts.data.map((post) => {
+          const {
+            id,
+            nome,
+            email,
+            title,
+            categories,
+            order,
+            language,
+            createdOn
+          } = post;
+          const result = [];
+          if (id) result.push(id);
+          if (nome) result.push(nome);
+          if (email) result.push(email);
+          if (title) result.push(title);
+          if (categories) result.push(categories);
+          if (order) result.push(order);
+          if (language) result.push(language);
+          if (createdOn) result.push(createdOn);
+          return result;
+        })
+    },
     pagination: true,
     search: true
   }).render(document.getElementById('table'));

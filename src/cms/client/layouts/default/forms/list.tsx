@@ -17,6 +17,11 @@ export const List = (props: {
         <div id='table'></div>
         <input
           type='hidden'
+          name='host'
+          value={`menu=${props.menu}&posttype=${props.posttype}`}
+        />
+        <input
+          type='hidden'
           name='dataField'
           value={JSON.stringify(props.data)}
         />
