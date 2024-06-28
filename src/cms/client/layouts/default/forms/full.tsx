@@ -126,6 +126,18 @@ export const FullForm = (props: {
             ));
           });
           break;
+        case 'reel':
+          html = item.map((it) => (
+            <Input
+              type='textarea'
+              cssClass='w-full'
+              placeholder='Insira o conteúdo'
+              name={`tags[${key}]`}
+              id={`tags[${key}]`}
+              value={it}
+            />
+          ));
+          break;
         default:
           html = item.map((it) => (
             <Input
@@ -206,6 +218,7 @@ export const FullForm = (props: {
               {getTags('fichaTecnica', 'Créditos')}
               {getTags('language', 'Idioma')}
               {getTags('socialMedia', 'Social Media')}
+              {getTags('reel', 'Reel')}
             </section>
             <h2>Adicionar seção</h2>
             <select
@@ -219,6 +232,7 @@ export const FullForm = (props: {
               <option value='fichaTecnica'>Créditos</option>
               <option value='language'>Idioma</option>
               <option value='socialMedia'>Social Media</option>
+              <option value='reel'>Reel</option>
             </select>
           </div>
           <Aside

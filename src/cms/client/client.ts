@@ -180,11 +180,6 @@ client.post('/add', async (ctx) => {
         } else {
           // format body
           formatBody = await formatPost(body, ctx);
-          // create hook
-          // const { resolveInput } = apiConfig.find(
-          //   (entry) => entry.route === menu
-          // ).hooks;
-          // const data = resolveInput.create(ctx, formatBody);
           // insert data
           result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
             table: menu,
@@ -318,7 +313,8 @@ export const formatPost = async (body, ctx) => {
     order: 0,
     fichaTecnica: [],
     language: null,
-    socialMedia: null
+    socialMedia: null,
+    reel: null
   };
   /**
    * GET POST IMAGE
@@ -371,6 +367,9 @@ export const formatPost = async (body, ctx) => {
   }
   if (body['tags[videos][]']) {
     resultTags.videos = body['tags[videos][]'];
+  }
+  if (body['tags[reel]']) {
+    resultTags.reel = body['tags[reel]'];
   }
   if (body['tags[language]']) {
     resultTags.language = body['tags[language]'];
@@ -470,6 +469,7 @@ export const EditCategories = async (ctx) => {
 };
 export const EditPost = async (ctx) => {
   const body = await ctx.req.parseBody();
+  console.log('---->body', body);
   const posttype = body['posttype'];
   const menu = body['menu'];
   const categories = body['category[]']
@@ -485,6 +485,7 @@ export const EditPost = async (ctx) => {
     };
     // FORMAT BODY
     const formatBody = await formatPost(await ctx.req.parseBody(), ctx);
+    console.log('--->formatBody', formatBody);
     const dataObj = { table: menu, id: postID, data: formatBody };
     // CREATE HOOK
     const { resolveInput } = apiConfig.find(

@@ -37,6 +37,9 @@ function crEl(name, id, full = 'w-full', attrs = {}) {
     inputWrapper = document.createElement('input');
     inputWrapper.type = 'radio';
     inputWrapper.placeholder = placeholder ? placeholder : 'Chave do conteúdo';
+  } else if (id.includes('reel')) {
+    inputWrapper = document.createElement('textarea');
+    inputWrapper.placeholder = placeholder ? placeholder : 'Chave do conteúdo';
   } else if (type == 'checkbox') {
     complWrapper = document.createElement('span');
     complWrapper.innerText = placeholder;
@@ -152,6 +155,24 @@ function addBlock(section, name) {
         return '';
       } else {
         sectionTitle.innerText = 'Idioma';
+        sectionWrapper.appendChild(sectionTitle);
+        sectionWrapper.appendChild(
+          crEl(`tags[${section}]`, `tags[${section}]`)
+        );
+        return sectionWrapper;
+      }
+      break;
+    case 'reel':
+      if (document.querySelector(`#${sectionName}`)) {
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(crEl(`tags[${section}]`, `tags[${section}]`));
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(crEl('close', 'close'));
+        return '';
+      } else {
+        sectionTitle.innerText = 'Reel';
         sectionWrapper.appendChild(sectionTitle);
         sectionWrapper.appendChild(
           crEl(`tags[${section}]`, `tags[${section}]`)
@@ -307,7 +328,6 @@ if (document.querySelector('input[name=host]')) {
             className:
               'py-2 mb-4 px-4 border rounded-md text-white bg-green-600',
             onClick: () => {
-              console.log('row', row);
               fetch('/v1/post-duplicate', {
                 method: 'POST',
                 body: JSON.stringify({
