@@ -28,6 +28,10 @@ export const Aside = async (props: {
       return true;
   }
 
+  const t = new Date(props.data.createdOn).toISOString().replace(/\..+Z$/, '');
+  // const t = '2017-06-01T08:30';
+  // const t = '2024-06-29T22:10:16';
+
   return (
     <aside class='basis-4/12 px-8'>
       <article class='my-5'>
@@ -38,6 +42,11 @@ export const Aside = async (props: {
         >
           Salvar Novo
         </button>
+      </article>
+      <article class='my-5'>
+        <h3 class='font-bold text-gray-500'>Data de criação</h3>
+        {/* <input type='datetime-local' name='' id='' value={t} /> */}
+        <Input type='datetime-local' value={t ? t : ''} id='createdOn' />
       </article>
       {props.hasCategory ? (
         <>

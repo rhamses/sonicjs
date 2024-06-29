@@ -305,6 +305,7 @@ export const formatPost = async (body, ctx) => {
     menu,
     userId,
     postOrder,
+    createdOn,
     local
   } = body;
   console.log('====>body', body);
@@ -352,6 +353,13 @@ export const formatPost = async (body, ctx) => {
         images.push(imageUploadUrl);
       }
     }
+  }
+  /**
+   * Transform Date
+   */
+  let newCreatedOn;
+  if (createdOn) {
+    newCreatedOn = new Date(createdOn).getTime();
   }
   /**
    * GET POST TAGS
@@ -402,6 +410,7 @@ export const formatPost = async (body, ctx) => {
     title,
     body: content,
     image,
+    createdOn: newCreatedOn,
     images,
     tags: [JSON.stringify(resultTags)],
     userId
