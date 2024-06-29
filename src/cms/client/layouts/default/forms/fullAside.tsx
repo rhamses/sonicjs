@@ -27,10 +27,10 @@ export const Aside = async (props: {
     if (postCategories && postCategories.find((cat) => cat.categoryId === id))
       return true;
   }
-
-  const t = new Date(props.data.createdOn).toISOString().replace(/\..+Z$/, '');
-  // const t = '2017-06-01T08:30';
-  // const t = '2024-06-29T22:10:16';
+  let t = new Date().toISOString().replace(/\..+Z$/, '');
+  if (props?.data?.createdOn) {
+    t = new Date(props.data.createdOn).toISOString().replace(/\..+Z$/, '');
+  }
 
   return (
     <aside class='basis-4/12 px-8'>
