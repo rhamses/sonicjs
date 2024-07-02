@@ -126,7 +126,6 @@ client.get('/edit', async (ctx) => {
       postData['categories'] = postCategories;
     }
     const Form = selectForm(menu);
-    console.log('===>postData', postData);
     return ctx.html(
       Form({ ctx, posttype, menu, data: postData, title: `Edit ${posttype}` })
     );
@@ -311,6 +310,7 @@ export const formatPost = async (body, ctx) => {
   console.log('====>body', body);
   const resultTags = {
     videos: null,
+    videosHome: null,
     order: 0,
     fichaTecnica: [],
     language: null,
@@ -375,6 +375,9 @@ export const formatPost = async (body, ctx) => {
   }
   if (body['tags[videos][]']) {
     resultTags.videos = body['tags[videos][]'];
+  }
+  if (body['tags[videos_home][]']) {
+    resultTags.videosHome = body['tags[videos_home][]'];
   }
   if (body['tags[reel]']) {
     resultTags.reel = body['tags[reel]'];

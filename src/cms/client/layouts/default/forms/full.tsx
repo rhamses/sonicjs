@@ -39,10 +39,12 @@ export const FullForm = (props: {
   }
   function getTags(key, title) {
     try {
+      console.log('props.data', props.data);
       const images = props?.data?.images;
       const postTags = props?.data?.tags
         ? JSON.parse(JSON.parse(props?.data?.tags)[0])
         : {};
+      // console.log('postTags', postTags);
       postTags['images'] = images;
       // Prepare Return
       let item = [];
@@ -52,7 +54,7 @@ export const FullForm = (props: {
         postTags[key] && !Array.isArray(postTags[key])
           ? [postTags[key]]
           : postTags[key];
-      console.log('===>item11', item);
+      // console.log('===>item11', item);
       let html;
       switch (key) {
         case 'images':
@@ -104,6 +106,7 @@ export const FullForm = (props: {
                 name={'tags[' + key + '_home][]'}
                 id={'tags[' + key + '_home][]'}
                 value={it}
+                checked={it === postTags['videosHome'] ? true : false}
                 label='Colocar video em destaque na home?'
               />
               {btnRemover()}
