@@ -93,103 +93,8 @@ client.get('/field', async (ctx) => {
 });
 client.get('/list', async (ctx) => {
   const { menu, posttype } = ctx.req.query();
-  let result = [];
   const title = pageTitle(posttype, menu);
-  if (posttype != 'users') {
-    let { data: postData } = await getRecords(
-      ctx,
-      menu,
-      {
-        sortBy: 'createdOn',
-        sortDirection: 'desc'
-      },
-      `${menu}-list`
-    );
-    const { data: allCategories } = await getRecords(
-      ctx,
-      'categories',
-      {},
-      `categories-list`
-    );
-    if (postData.length > 0) {
-      postData = postData.map((item) => {
-        if (item.tags && item.tags.length > 0) {
-          item.tags = JSON.parse(JSON.parse(item.tags)[0]);
-        }
-        return item;
-      });
-      postData = postData
-        .filter((post) => (post.tags ? post.tags.posttype == posttype : null))
-        .map((item) => {
-          return {
-            ...item,
-            ...item['tags']
-          };
-        });
-      for (const post of postData) {
-        const { data: postCategories } = await getRecords(
-          ctx,
-          'categoriesToPosts',
-          {
-            filters: {
-              postId: {
-                $eq: post.id
-              }
-            }
-          },
-          `${post.id}-categories`
-        );
-        // get all cat names
-        post['categories'] = postCategories
-          .map((postCategory) =>
-            allCategories.find(
-              (category) => category.id === postCategory.categoryId
-            )
-          )
-          .map((postCategory) => postCategory.title)
-          .join(', ');
-        result.push(post);
-      }
-    }
-  } else {
-    let { data: postData } = await getRecords(
-      ctx,
-      menu,
-      {},
-      `${posttype}-list`
-    );
-    if (postData.length > 0) {
-      postData.forEach((post) => {
-        result.push({
-          id: post.id,
-          nome: post.firstName,
-          email: post.email,
-          createdOn: post.createdOn
-        });
-      });
-    }
-  }
-  // format date
-  result = result.filter(
-    (item) =>
-      (item.createdOn = `${String(new Date(item.createdOn).getDate()).padStart(
-        2,
-        '0'
-      )}/${String(new Date(item.createdOn).getMonth() + 1).padStart(
-        2,
-        '0'
-      )}/${new Date(item.createdOn).getFullYear()}
-      ${String(new Date(item.createdOn).getHours()).padStart(2, '0')}:${String(
-        new Date(item.createdOn).getMinutes()
-      ).padStart(2, '0')}:${String(
-        new Date(item.createdOn).getSeconds()
-      ).padStart(2, '0')}`)
-  );
-  // re order by order
-  result = result.sort((a, b) => b?.tags?.order - a?.tags?.order);
-  return ctx.html(
-    List({ ctx, posttype, menu, data: result, title: `Listar ${title}` })
-  );
+  return ctx.html(List({ ctx, posttype, menu, title: `Listar ${title}` }));
 });
 
 client.get('/add', async (ctx) => {
@@ -221,7 +126,6 @@ client.get('/edit', async (ctx) => {
       postData['categories'] = postCategories;
     }
     const Form = selectForm(menu);
-    console.log('===>postData', postData);
     return ctx.html(
       Form({ ctx, posttype, menu, data: postData, title: `Edit ${posttype}` })
     );
@@ -275,11 +179,6 @@ client.post('/add', async (ctx) => {
         } else {
           // format body
           formatBody = await formatPost(body, ctx);
-          // create hook
-          // const { resolveInput } = apiConfig.find(
-          //   (entry) => entry.route === menu
-          // ).hooks;
-          // const data = resolveInput.create(ctx, formatBody);
           // insert data
           result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
             table: menu,
@@ -405,15 +304,18 @@ export const formatPost = async (body, ctx) => {
     menu,
     userId,
     postOrder,
+    createdOn,
     local
   } = body;
   console.log('====>body', body);
   const resultTags = {
     videos: null,
+    videosHome: null,
     order: 0,
     fichaTecnica: [],
     language: null,
-    socialMedia: null
+    socialMedia: null,
+    reel: null
   };
   /**
    * GET POST IMAGE
@@ -453,6 +355,13 @@ export const formatPost = async (body, ctx) => {
     }
   }
   /**
+   * Transform Date
+   */
+  let newCreatedOn;
+  if (createdOn) {
+    newCreatedOn = new Date(createdOn).getTime();
+  }
+  /**
    * GET POST TAGS
    */
   if (posttype) {
@@ -466,6 +375,12 @@ export const formatPost = async (body, ctx) => {
   }
   if (body['tags[videos][]']) {
     resultTags.videos = body['tags[videos][]'];
+  }
+  if (body['tags[videos_home][]']) {
+    resultTags.videosHome = body['tags[videos_home][]'];
+  }
+  if (body['tags[reel]']) {
+    resultTags.reel = body['tags[reel]'];
   }
   if (body['tags[language]']) {
     resultTags.language = body['tags[language]'];
@@ -498,10 +413,16 @@ export const formatPost = async (body, ctx) => {
     title,
     body: content,
     image,
+    createdOn: newCreatedOn,
     images,
     tags: [JSON.stringify(resultTags)],
     userId
   };
+};
+export const formatPostTag = (post) => {
+  const { tags } = post;
+  const tagsFormatted = JSON.parse(JSON.parse(tags)[0]);
+  return { ...tagsFormatted, ...post };
 };
 export const addPostsCategory = async (ctx, postId, categories) => {
   let result = [];
@@ -560,6 +481,7 @@ export const EditCategories = async (ctx) => {
 };
 export const EditPost = async (ctx) => {
   const body = await ctx.req.parseBody();
+  console.log('---->body', body);
   const posttype = body['posttype'];
   const menu = body['menu'];
   const categories = body['category[]']
@@ -575,6 +497,7 @@ export const EditPost = async (ctx) => {
     };
     // FORMAT BODY
     const formatBody = await formatPost(await ctx.req.parseBody(), ctx);
+    console.log('--->formatBody', formatBody);
     const dataObj = { table: menu, id: postID, data: formatBody };
     // CREATE HOOK
     const { resolveInput } = apiConfig.find(

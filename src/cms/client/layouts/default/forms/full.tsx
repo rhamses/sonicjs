@@ -39,10 +39,12 @@ export const FullForm = (props: {
   }
   function getTags(key, title) {
     try {
+      console.log('props.data', props.data);
       const images = props?.data?.images;
       const postTags = props?.data?.tags
         ? JSON.parse(JSON.parse(props?.data?.tags)[0])
         : {};
+      // console.log('postTags', postTags);
       postTags['images'] = images;
       // Prepare Return
       let item = [];
@@ -52,7 +54,7 @@ export const FullForm = (props: {
         postTags[key] && !Array.isArray(postTags[key])
           ? [postTags[key]]
           : postTags[key];
-      console.log('===>item11', item);
+      // console.log('===>item11', item);
       let html;
       switch (key) {
         case 'images':
@@ -104,6 +106,7 @@ export const FullForm = (props: {
                 name={'tags[' + key + '_home][]'}
                 id={'tags[' + key + '_home][]'}
                 value={it}
+                checked={it === postTags['videosHome'] ? true : false}
                 label='Colocar video em destaque na home?'
               />
               {btnRemover()}
@@ -125,6 +128,18 @@ export const FullForm = (props: {
               </>
             ));
           });
+          break;
+        case 'reel':
+          html = item.map((it) => (
+            <Input
+              type='textarea'
+              cssClass='w-full'
+              placeholder='Insira o conteúdo'
+              name={`tags[${key}]`}
+              id={`tags[${key}]`}
+              value={it}
+            />
+          ));
           break;
         default:
           html = item.map((it) => (
@@ -206,6 +221,7 @@ export const FullForm = (props: {
               {getTags('fichaTecnica', 'Créditos')}
               {getTags('language', 'Idioma')}
               {getTags('socialMedia', 'Social Media')}
+              {getTags('reel', 'Reel')}
             </section>
             <h2>Adicionar seção</h2>
             <select
@@ -219,6 +235,7 @@ export const FullForm = (props: {
               <option value='fichaTecnica'>Créditos</option>
               <option value='language'>Idioma</option>
               <option value='socialMedia'>Social Media</option>
+              <option value='reel'>Reel</option>
             </select>
           </div>
           <Aside

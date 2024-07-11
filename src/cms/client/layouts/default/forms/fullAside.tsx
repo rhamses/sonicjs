@@ -27,6 +27,10 @@ export const Aside = async (props: {
     if (postCategories && postCategories.find((cat) => cat.categoryId === id))
       return true;
   }
+  let t = new Date().toISOString().replace(/\..+Z$/, '');
+  if (props?.data?.createdOn) {
+    t = new Date(props.data.createdOn).toISOString().replace(/\..+Z$/, '');
+  }
 
   return (
     <aside class='basis-4/12 px-8'>
@@ -38,6 +42,16 @@ export const Aside = async (props: {
         >
           Salvar Novo
         </button>
+      </article>
+      <article class='my-5'>
+        <h3 class='font-bold text-gray-500'>Data de criação</h3>
+        {/* <input type='datetime-local' name='' id='' value={t} /> */}
+        <Input
+          type='datetime-local'
+          step='any'
+          value={t ? t : ''}
+          id='createdOn'
+        />
       </article>
       {props.hasCategory ? (
         <>

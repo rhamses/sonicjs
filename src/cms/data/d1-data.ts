@@ -15,7 +15,7 @@ export async function getD1DataByTable(db, table, params) {
 }
 
 export function generateSelectSql(table, params) {
-  // console.log("params ==>", JSON.stringify(params, null, 2));
+  console.log('params ==>', JSON.stringify(params, null, 2));
 
   var whereClause = '';
   var sortBySyntax = '';
