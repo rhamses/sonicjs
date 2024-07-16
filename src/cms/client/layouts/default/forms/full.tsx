@@ -60,7 +60,7 @@ export const FullForm = (props: {
         case 'images':
           item = JSON.parse(item[0]);
           html = item.map((it) => (
-            <>
+            <div class='w-full'>
               <img class='max-h-60' src={it} alt='' />
               <Input
                 type='hidden'
@@ -69,7 +69,7 @@ export const FullForm = (props: {
                 id={key + '[]'}
               />
               {btnRemover()}
-            </>
+            </div>
           ));
           break;
         case 'language':
