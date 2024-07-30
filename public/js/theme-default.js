@@ -118,9 +118,12 @@ function addBlock(section, name) {
         return '';
       } else {
         sectionTitle.innerText = 'Imagens';
+        const divinput = document.createElement('div');
+        divinput.classList.add('w-full');
+        divinput.appendChild(crEl(elName, elName));
+        divinput.appendChild(crEl('close', 'close'));
         sectionWrapper.appendChild(sectionTitle);
-        sectionWrapper.appendChild(crEl(elName, elName));
-        sectionWrapper.appendChild(crEl('close', 'close'));
+        sectionWrapper.appendChild(divinput);
         return sectionWrapper;
       }
       break;

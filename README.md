@@ -1,6 +1,6 @@
 # SonicJs Headless CMS
 
-# Overview
+## Overview
 
 ## SonicJs: Empowering Global API Performance with Cloudflare Workers
 
