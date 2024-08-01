@@ -127,7 +127,7 @@ export const Script = () => {
       ></script>
       <script src='https://cdn.form.io/formiojs/formio.full.min.js'></script>
       <script src='/public/js/form-login.js'></script>
-      <script src='/public/js/theme-tailwind.js'></script>
+      {/* <script src='/public/js/theme-tailwind.js'></script> */}
     </>
   );
 };
