@@ -329,6 +329,7 @@ if (document.querySelector('input[name=host]')) {
             className: 'py-2 mb-4 px-4 border rounded-md text-white bg-red-600',
             onClick: () => {
               if (confirm('Deseja remover o registro?'))
+                document.body.classList.add(
                 fetch(
                   '/client/list?id=' +
                     row.cells[0].data +
@@ -351,7 +352,14 @@ if (document.querySelector('input[name=host]')) {
                     document.body.classList.remove('loading');
                     location.reload();
                   })
-                  .catch((err) => console.error(err));
+                }
+              )
+                .then((res) => res.json())
+                .then((res) => {
+                  document.body.classList.remove('loading');
+                  location.reload();
+                })
+                .catch((err) => console.error(err));
             }
           },
           'Apagar'
