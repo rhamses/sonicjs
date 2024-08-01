@@ -29,6 +29,29 @@ export default (props: {
         />
         <link rel="stylesheet" href="/public/css/tailwind.css" />
         <title>Default SonicJS - Client Panel</title>
+        <style>
+          body.loading::before {
+            content: '';
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 100;
+          }
+          body.loading::after {
+            content: '';
+            display: block;
+            height: 50px;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            width: 50px;
+            background-image: url(https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWU0a2sza2Q3Zm1la2tybXB0cDR2eWVwamZ6MDY4emFyd21ydHIwYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.webp);
+            background-size: cover;
+            background-color: transparent;
+            z-index: 101;
+          }
+        </style>
       </head>
       <body>
         <main>${Sidebar()} ${props.children}</main>
