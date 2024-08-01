@@ -8,6 +8,7 @@ export const Input = (props: {
   value?: string;
   checked?: boolean;
   step: string;
+  children?: any;
 }) => {
   let inputCss = 'rounded-lg border border-gray ';
   let cssWrapper = '';
@@ -69,6 +70,7 @@ export const Input = (props: {
           step={props.step}
         />
       )}
+      {props.children}
     </div>
   );
 };

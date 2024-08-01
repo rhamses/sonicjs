@@ -668,4 +668,15 @@ api.get('/kv/delete-all', async (ctx) => {
 
 api.route('/bucket', bucketApi);
 
+api.get('/random-job', async (ctx) => {
+  let posts = await getRecords(ctx, 'posts', '', 'posts');
+  posts = posts.data.filter((post) => post.image && post.tags.includes('jobs'));
+  const post = posts[Math.floor(Math.random() * posts.length)];
+  const ext = post.image.match(/\.[a-z]{3}$/gim)[0].replace('.', '');
+  const image = await fetch(post.image).then((r) => r.blob());
+  return ctx.body(image, 200, {
+    'Content-Type': 'image/' + ext
+  });
+});
+
 export { api };

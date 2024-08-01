@@ -39,12 +39,11 @@ export const FullForm = (props: {
   }
   function getTags(key, title) {
     try {
-      console.log('props.data', props.data);
       const images = props?.data?.images;
       const postTags = props?.data?.tags
         ? JSON.parse(JSON.parse(props?.data?.tags)[0])
         : {};
-      // console.log('postTags', postTags);
+      console.log('postTags', postTags);
       postTags['images'] = images;
       // Prepare Return
       let item = [];
@@ -60,7 +59,7 @@ export const FullForm = (props: {
         case 'images':
           item = JSON.parse(item[0]);
           html = item.map((it) => (
-            <>
+            <div class='w-full'>
               <img class='max-h-60' src={it} alt='' />
               <Input
                 type='hidden'
@@ -69,7 +68,7 @@ export const FullForm = (props: {
                 id={key + '[]'}
               />
               {btnRemover()}
-            </>
+            </div>
           ));
           break;
         case 'language':
@@ -108,7 +107,22 @@ export const FullForm = (props: {
                 value={it}
                 checked={it === postTags['videosHome'] ? true : false}
                 label='Colocar video em destaque na home?'
-              />
+              >
+                {it === postTags['videosHome'] && postTags.videosHomeOrder ? (
+                  <input
+                    id='tags[videos_home_order]'
+                    name='tags[videos_home_order]'
+                    type='number'
+                    placeholder='Digite a ordem na home'
+                    style='order: 3; margin-left: 10px; width: 150px;'
+                    class='rounded-lg border border-gray p-3 w-full'
+                    value={postTags.videosHomeOrder}
+                  />
+                ) : (
+                  ''
+                )}
+              </Input>
+
               {btnRemover()}
             </>
           ));

@@ -118,9 +118,12 @@ function addBlock(section, name) {
         return '';
       } else {
         sectionTitle.innerText = 'Imagens';
+        const divinput = document.createElement('div');
+        divinput.classList.add('w-full');
+        divinput.appendChild(crEl(elName, elName));
+        divinput.appendChild(crEl('close', 'close'));
         sectionWrapper.appendChild(sectionTitle);
-        sectionWrapper.appendChild(crEl(elName, elName));
-        sectionWrapper.appendChild(crEl('close', 'close'));
+        sectionWrapper.appendChild(divinput);
         return sectionWrapper;
       }
       break;
@@ -236,6 +239,34 @@ document.querySelectorAll("a[href*='delete']").forEach((item) =>
   })
 );
 
+// CHECKBOX ORDEM VIDEO HOME
+const videos_home_order = document.querySelectorAll('input[id*=videos_home');
+if (videos_home_order.length > 0) {
+  videos_home_order.forEach((item) =>
+    item.addEventListener('change', () => {
+      // reset status
+      videos_home_order.forEach((item) => {
+        if (item.nextSibling) item.nextSibling.remove();
+      });
+      // create element
+      const parentItem = item.parentElement;
+      const inp = document.createElement('input');
+      inp.id = 'tags[videos_home_order]';
+      inp.name = 'tags[videos_home_order]';
+      inp.type = 'number';
+      inp.placeholder = 'Digite a ordem na home';
+      inp.style.order = '3';
+      inp.style.marginLeft = '10px';
+      inp.style.width = '150px';
+      inp.classList.add('rounded-lg');
+      inp.classList.add('border');
+      inp.classList.add('border-gray');
+      inp.classList.add('p-3');
+      inp.classList.add('w-full');
+      parentItem.appendChild(inp);
+    })
+  );
+}
 if (document.querySelector('#extraContent')) {
   document.querySelector('#extraContent').addEventListener('change', (e) => {
     if (e.target.value) {
@@ -298,25 +329,25 @@ if (document.querySelector('input[name=host]')) {
             className: 'py-2 mb-4 px-4 border rounded-md text-white bg-red-600',
             onClick: () => {
               if (confirm('Deseja remover o registro?'))
-                fetch(
-                  '/client/list?id=' +
-                    row.cells[0].data +
-                    '&posttype=' +
-                    new URLSearchParams(document.location.search).get(
-                      'posttype'
-                    ),
-                  {
-                    method: 'DELETE',
-                    body: JSON.stringify({
-                      title: row.cells[0].data
-                    })
-                  }
-                )
-                  .then((res) => res.json())
-                  .then((res) => {
-                    location.reload();
+                document.body.classList.add('loading');
+              fetch(
+                '/client/list?id=' +
+                  row.cells[0].data +
+                  '&posttype=' +
+                  new URLSearchParams(document.location.search).get('posttype'),
+                {
+                  method: 'DELETE',
+                  body: JSON.stringify({
+                    title: row.cells[0].data
                   })
-                  .catch((err) => console.error(err));
+                }
+              )
+                .then((res) => res.json())
+                .then((res) => {
+                  document.body.classList.remove('loading');
+                  location.reload();
+                })
+                .catch((err) => console.error(err));
             }
           },
           'Apagar'
@@ -328,6 +359,7 @@ if (document.querySelector('input[name=host]')) {
             className:
               'py-2 mb-4 px-4 border rounded-md text-white bg-green-600',
             onClick: () => {
+              document.body.classList.add('loading');
               fetch('/v1/post-duplicate', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -337,6 +369,7 @@ if (document.querySelector('input[name=host]')) {
               })
                 .then((res) => res.json())
                 .then((res) => {
+                  document.body.classList.remove('loading');
                   location.reload();
                 })
                 .catch((err) => console.error(err));
