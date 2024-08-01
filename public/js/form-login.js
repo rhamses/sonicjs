@@ -27,9 +27,11 @@
       ]
     }).then(function (form) {
       form.on('submit', function (data) {
+        document.body.classList.add('loading');
         axios
           .post(`/v1/auth/login`, data?.data)
           .then((response) => {
+            document.body.classList.remove('loading');
             document.getElementById('login-errors').innerHTML = '';
             console.log(response.data);
             console.log(response.status);
@@ -39,6 +41,7 @@
             location.href = '/client';
           })
           .catch((error) => {
+            document.body.classList.remove('loading');
             document.getElementById('login-errors').innerHTML =
               error.response.data;
             console.log(error.response.data);

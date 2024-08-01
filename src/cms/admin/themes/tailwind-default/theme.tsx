@@ -37,11 +37,11 @@ export const LoginWrapper = (props: {
             {props.children}
           </article>
         </div>
-        <div>
+        <div class='bg-black'>
           <img
-            src='https://source.unsplash.com/random'
+            src='/v1/random-job'
             alt=''
-            class='h-screen w-screen object-cover object-center'
+            class='h-screen w-screen object-cover object-center opacity-50'
           />
         </div>
       </section>
