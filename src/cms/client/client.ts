@@ -311,6 +311,7 @@ export const formatPost = async (body, ctx) => {
   const resultTags = {
     videos: null,
     videosHome: null,
+    videosHomeOrder: null,
     order: 0,
     fichaTecnica: [],
     language: null,
@@ -379,6 +380,9 @@ export const formatPost = async (body, ctx) => {
   if (body['tags[videos_home][]']) {
     resultTags.videosHome = body['tags[videos_home][]'];
   }
+  if (body['tags[videos_home_order]']) {
+    resultTags.videosHomeOrder = body['tags[videos_home_order]'];
+  }
   if (body['tags[reel]']) {
     resultTags.reel = body['tags[reel]'];
   }
@@ -426,7 +430,6 @@ export const formatPostTag = (post) => {
 };
 export const addPostsCategory = async (ctx, postId, categories) => {
   let result = [];
-  console.log('===>categories', categories);
   if (categories) {
     for (const categoryId of categories) {
       const response = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {

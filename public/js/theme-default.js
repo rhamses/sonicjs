@@ -239,6 +239,34 @@ document.querySelectorAll("a[href*='delete']").forEach((item) =>
   })
 );
 
+// CHECKBOX ORDEM VIDEO HOME
+const videos_home_order = document.querySelectorAll('input[id*=videos_home');
+if (videos_home_order.length > 0) {
+  videos_home_order.forEach((item) =>
+    item.addEventListener('change', () => {
+      // reset status
+      videos_home_order.forEach((item) => {
+        if (item.nextSibling) item.nextSibling.remove();
+      });
+      // create element
+      const parentItem = item.parentElement;
+      const inp = document.createElement('input');
+      inp.id = 'tags[videos_home_order]';
+      inp.name = 'tags[videos_home_order]';
+      inp.type = 'number';
+      inp.placeholder = 'Digite a ordem na home';
+      inp.style.order = '3';
+      inp.style.marginLeft = '10px';
+      inp.style.width = '150px';
+      inp.classList.add('rounded-lg');
+      inp.classList.add('border');
+      inp.classList.add('border-gray');
+      inp.classList.add('p-3');
+      inp.classList.add('w-full');
+      parentItem.appendChild(inp);
+    })
+  );
+}
 if (document.querySelector('#extraContent')) {
   document.querySelector('#extraContent').addEventListener('change', (e) => {
     if (e.target.value) {
@@ -315,8 +343,12 @@ if (document.querySelector('input[name=host]')) {
                     })
                   }
                 )
-                  .then((res) => res.json())
                   .then((res) => {
+                    document.body.classList.add('loading');
+                    res.json();
+                  })
+                  .then((res) => {
+                    document.body.classList.remove('loading');
                     location.reload();
                   })
                   .catch((err) => console.error(err));
@@ -331,6 +363,7 @@ if (document.querySelector('input[name=host]')) {
             className:
               'py-2 mb-4 px-4 border rounded-md text-white bg-green-600',
             onClick: () => {
+              document.body.classList.add('loading');
               fetch('/v1/post-duplicate', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -340,6 +373,7 @@ if (document.querySelector('input[name=host]')) {
               })
                 .then((res) => res.json())
                 .then((res) => {
+                  document.body.classList.remove('loading');
                   location.reload();
                 })
                 .catch((err) => console.error(err));
