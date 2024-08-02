@@ -99,30 +99,19 @@ export const FullForm = (props: {
                 value={it}
               />
               <Input
-                type='radio'
+                type='checkbox'
+                checked={
+                  postTags['videosHome'].find((item) => item == it)
+                    ? true
+                    : false
+                }
                 cssClass='w-full !mt-0'
                 placeholder='Insira o conteúdo'
                 name={'tags[' + key + '_home][]'}
                 id={'tags[' + key + '_home][]'}
                 value={it}
-                checked={it === postTags['videosHome'] ? true : false}
-                label='Colocar video em destaque na home?'
-              >
-                {it === postTags['videosHome'] && postTags.videosHomeOrder ? (
-                  <input
-                    id='tags[videos_home_order]'
-                    name='tags[videos_home_order]'
-                    type='number'
-                    placeholder='Digite a ordem na home'
-                    style='order: 3; margin-left: 10px; width: 150px;'
-                    class='rounded-lg border border-gray p-3 w-full'
-                    value={postTags.videosHomeOrder}
-                  />
-                ) : (
-                  ''
-                )}
-              </Input>
-
+                label='Mostrar na home?'
+              />
               {btnRemover()}
             </>
           ));
@@ -269,6 +258,7 @@ export const FullForm = (props: {
             id='userId'
           />
         </form>
+        <span class='pt-0 !pt-0'></span>
       </MainContent>
     </Default>
   );

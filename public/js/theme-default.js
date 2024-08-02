@@ -32,14 +32,22 @@ function crEl(name, id, full = 'w-full', attrs = {}) {
     inputWrapper.type = 'file';
     inputWrapper.placeholder = 'Chave do conteúdo';
   } else if (id.includes('videos_home')) {
-    // complWrapper = document.createElement('span');
-    // complWrapper.innerText = placeholder;
-    inputWrapper = document.createElement('input');
-    inputWrapper.type = 'radio';
-    inputWrapper.placeholder = placeholder ? placeholder : 'Chave do conteúdo';
-  } else if (id.includes('reel')) {
-    inputWrapper = document.createElement('textarea');
-    inputWrapper.placeholder = placeholder ? placeholder : 'Chave do conteúdo';
+    inputWrapper = document.createElement('label');
+    const layerRadio = document.createElement('input');
+    layerRadio.type = 'checkbox';
+    layerRadio.id = id;
+    layerRadio.name = name;
+    layerRadio.addEventListener('change', (e) => {
+      const value = e.target.parentElement.previousSibling.value;
+      e.target.value = value;
+    });
+    const layerText = document.createElement('span');
+    layerText.innerText = 'Mostrar na home?';
+    layerText.classList.add('ml-3');
+    inputWrapper.appendChild(layerRadio);
+    inputWrapper.appendChild(layerText);
+    inputWrapper.classList.add('border-0');
+    inputWrapper.classList.add('pt-0');
   } else if (type == 'checkbox') {
     complWrapper = document.createElement('span');
     complWrapper.innerText = placeholder;
@@ -132,6 +140,9 @@ function addBlock(section, name) {
         document
           .querySelector(`#${sectionName}`)
           .appendChild(crEl('tags[videos][]', 'tags[videos][]'));
+        document
+          .querySelector(`#${sectionName}`)
+          .appendChild(crEl('tags[videos_home][]', 'tags[videos_home][]'));
         document
           .querySelector(`#${sectionName}`)
           .appendChild(crEl('close', 'close'));

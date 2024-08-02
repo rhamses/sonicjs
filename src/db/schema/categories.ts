@@ -12,6 +12,7 @@ export const route = 'categories';
 export const definition = {
   id: text('id').primaryKey(),
   title: text('title'),
+  slug: text('slug'),
   body: text('body')
 };
 
