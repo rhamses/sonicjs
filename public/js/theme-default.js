@@ -32,22 +32,14 @@ function crEl(name, id, full = 'w-full', attrs = {}) {
     inputWrapper.type = 'file';
     inputWrapper.placeholder = 'Chave do conteúdo';
   } else if (id.includes('videos_home')) {
-    inputWrapper = document.createElement('label');
-    const layerRadio = document.createElement('input');
-    layerRadio.type = 'checkbox';
-    layerRadio.id = id;
-    layerRadio.name = name;
-    layerRadio.addEventListener('change', (e) => {
-      const value = e.target.parentElement.previousSibling.value;
-      e.target.value = value;
-    });
-    const layerText = document.createElement('span');
-    layerText.innerText = 'Mostrar na home?';
-    layerText.classList.add('ml-3');
-    inputWrapper.appendChild(layerRadio);
-    inputWrapper.appendChild(layerText);
-    inputWrapper.classList.add('border-0');
-    inputWrapper.classList.add('pt-0');
+    // complWrapper = document.createElement('span');
+    // complWrapper.innerText = placeholder;
+    inputWrapper = document.createElement('input');
+    inputWrapper.type = 'radio';
+    inputWrapper.placeholder = placeholder ? placeholder : 'Chave do conteúdo';
+  } else if (id.includes('reel')) {
+    inputWrapper = document.createElement('textarea');
+    inputWrapper.placeholder = placeholder ? placeholder : 'Chave do conteúdo';
   } else if (type == 'checkbox') {
     complWrapper = document.createElement('span');
     complWrapper.innerText = placeholder;
@@ -140,9 +132,6 @@ function addBlock(section, name) {
         document
           .querySelector(`#${sectionName}`)
           .appendChild(crEl('tags[videos][]', 'tags[videos][]'));
-        document
-          .querySelector(`#${sectionName}`)
-          .appendChild(crEl('tags[videos_home][]', 'tags[videos_home][]'));
         document
           .querySelector(`#${sectionName}`)
           .appendChild(crEl('close', 'close'));
@@ -340,28 +329,16 @@ if (document.querySelector('input[name=host]')) {
             className: 'py-2 mb-4 px-4 border rounded-md text-white bg-red-600',
             onClick: () => {
               if (confirm('Deseja remover o registro?'))
-                document.body.classList.add(
-                fetch(
-                  '/client/list?id=' +
-                    row.cells[0].data +
-                    '&posttype=' +
-                    new URLSearchParams(document.location.search).get(
-                      'posttype'
-                    ),
-                  {
-                    method: 'DELETE',
-                    body: JSON.stringify({
-                      title: row.cells[0].data
-                    })
-                  }
-                )
-                  .then((res) => {
-                    document.body.classList.add('loading');
-                    res.json();
-                  })
-                  .then((res) => {
-                    document.body.classList.remove('loading');
-                    location.reload();
+                document.body.classList.add('loading');
+              fetch(
+                '/client/list?id=' +
+                  row.cells[0].data +
+                  '&posttype=' +
+                  new URLSearchParams(document.location.search).get('posttype'),
+                {
+                  method: 'DELETE',
+                  body: JSON.stringify({
+                    title: row.cells[0].data
                   })
                 }
               )
