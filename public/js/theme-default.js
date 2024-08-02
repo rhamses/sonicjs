@@ -329,28 +329,16 @@ if (document.querySelector('input[name=host]')) {
             className: 'py-2 mb-4 px-4 border rounded-md text-white bg-red-600',
             onClick: () => {
               if (confirm('Deseja remover o registro?'))
-                document.body.classList.add(
-                fetch(
-                  '/client/list?id=' +
-                    row.cells[0].data +
-                    '&posttype=' +
-                    new URLSearchParams(document.location.search).get(
-                      'posttype'
-                    ),
-                  {
-                    method: 'DELETE',
-                    body: JSON.stringify({
-                      title: row.cells[0].data
-                    })
-                  }
-                )
-                  .then((res) => {
-                    document.body.classList.add('loading');
-                    res.json();
-                  })
-                  .then((res) => {
-                    document.body.classList.remove('loading');
-                    location.reload();
+                document.body.classList.add('loading');
+              fetch(
+                '/client/list?id=' +
+                  row.cells[0].data +
+                  '&posttype=' +
+                  new URLSearchParams(document.location.search).get('posttype'),
+                {
+                  method: 'DELETE',
+                  body: JSON.stringify({
+                    title: row.cells[0].data
                   })
                 }
               )

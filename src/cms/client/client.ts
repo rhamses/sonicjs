@@ -389,6 +389,11 @@ export const formatPost = async (body, ctx) => {
   if (body['tags[language]']) {
     resultTags.language = body['tags[language]'];
   }
+  if (body['tags[videos_home][]']) {
+    resultTags.videosHome = Array.isArray(body['tags[videos_home][]'])
+      ? body['tags[videos_home][]']
+      : [body['tags[videos_home][]']];
+  }
   if (body['tags[socialMedia][]']) {
     resultTags.socialMedia = Array.isArray(body['tags[socialMedia][]'])
       ? body['tags[socialMedia][]']
