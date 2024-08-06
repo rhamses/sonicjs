@@ -101,8 +101,10 @@ export const FullForm = (props: {
               <Input
                 type='checkbox'
                 checked={
-                  postTags['videosHome'].find((item) => item == it)
-                    ? true
+                  postTags['videosHome']
+                    ? postTags['videosHome'].find((item) => item == it)
+                      ? true
+                      : false
                     : false
                 }
                 cssClass='w-full !mt-0'
