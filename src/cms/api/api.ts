@@ -34,6 +34,7 @@ import {
 
 import { bucketApi } from '../bucket/bucket.api';
 import { formatPostTag } from '../client/client';
+import { slugify } from '../../db/config-helpers';
 
 const api = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 const tables = apiConfig.filter((tbl) => tbl.table !== 'users');
@@ -677,6 +678,51 @@ api.get('/random-job', async (ctx) => {
   return ctx.body(image, 200, {
     'Content-Type': 'image/' + ext
   });
+});
+
+api.get('/job/:slug', async (ctx) => {
+  try {
+    const slug = ctx.req.param('slug');
+    const categories = await getRecords(ctx, 'categories', '', 'categories');
+    console.log('slug', slug);
+    console.log('categories', categories);
+    const categorySelected = categories.data.find(
+      (cat) => slugify(cat.title) === slug
+    );
+    console.log('categorySelected', categorySelected);
+    const categoriesPosts = await getRecords(
+      ctx,
+      'categoriesToPosts',
+      {
+        filters: {
+          categoryId: {
+            $eq: categorySelected.id
+          }
+        }
+      },
+      categorySelected.id
+    );
+    console.log('categoriesPosts', categoriesPosts);
+    const posts = await Promise.all(
+      categoriesPosts.data.map(async (catp) => {
+        console.log('catp', catp);
+        const { data } = await getRecords(
+          ctx,
+          'posts',
+          { id: catp.postId },
+          `${slugify(categorySelected.title)}-${catp.postId}`
+        );
+        return data;
+      })
+    );
+    console.log('posts=>', posts);
+    return ctx.body(JSON.stringify(posts), 200, {
+      'Content-Type': 'application/json'
+    });
+  } catch (error) {
+    console.log(error);
+    return ctx.body(JSON.stringify({ hello: 'world' }), 401);
+  }
 });
 
 export { api };
