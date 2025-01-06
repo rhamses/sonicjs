@@ -683,12 +683,11 @@ api.get('/random-job', async (ctx) => {
 api.get('/posttype/:slug', async (ctx) => {
   try {
     const slug = ctx.req.param('slug');
-    const posts = await getRecords(ctx, 'posts', '', 'posts');
+    const posts = await getRecords(ctx, 'posts', '', slug);
     console.log('posts');
     posts.data = posts.data.filter((post) =>
       post.tags.includes(`"posttype\\":\\"${slug}\\"`)
     );
-    console.log('posts=>', posts);
     return ctx.body(JSON.stringify(posts), 200, {
       'Content-Type': 'application/json'
     });
