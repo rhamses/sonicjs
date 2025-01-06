@@ -680,12 +680,27 @@ api.get('/random-job', async (ctx) => {
   });
 });
 
+api.get('/posttype/:slug', async (ctx) => {
+  try {
+    const slug = ctx.req.param('slug');
+    const posts = await getRecords(ctx, 'posts', '', slug);
+    console.log('posts');
+    posts.data = posts.data.filter((post) =>
+      post.tags.includes(`"posttype\\":\\"${slug}\\"`)
+    );
+    return ctx.body(JSON.stringify(posts), 200, {
+      'Content-Type': 'application/json'
+    });
+  } catch (error) {
+    console.log(error);
+    return ctx.body(JSON.stringify({ hello: 'world' }), 401);
+  }
+});
+
 api.get('/job/:slug', async (ctx) => {
   try {
     const slug = ctx.req.param('slug');
     const categories = await getRecords(ctx, 'categories', '', 'categories');
-    console.log('slug', slug);
-    console.log('categories', categories);
     const categorySelected = categories.data.find(
       (cat) => slugify(cat.title) === slug
     );
@@ -702,7 +717,6 @@ api.get('/job/:slug', async (ctx) => {
       },
       categorySelected.id
     );
-    console.log('categoriesPosts', categoriesPosts);
     const posts = await Promise.all(
       categoriesPosts.data.map(async (catp) => {
         console.log('catp', catp);
