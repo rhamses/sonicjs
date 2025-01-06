@@ -685,11 +685,11 @@ api.get('/posttype/:slug', async (ctx) => {
     const slug = ctx.req.param('slug');
     const posts = await getRecords(ctx, 'posts', '', 'posts');
     console.log('posts');
-    const postsFiltered = posts.data.filter((post) =>
+    posts.data = posts.data.filter((post) =>
       post.tags.includes(`"posttype\\":\\"${slug}\\"`)
     );
-    console.log('posts=>', postsFiltered);
-    return ctx.body(JSON.stringify(postsFiltered), 200, {
+    console.log('posts=>', posts);
+    return ctx.body(JSON.stringify(posts), 200, {
       'Content-Type': 'application/json'
     });
   } catch (error) {
