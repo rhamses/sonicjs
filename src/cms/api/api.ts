@@ -683,8 +683,7 @@ api.get('/random-job', async (ctx) => {
 api.get('/posttype/:slug', async (ctx) => {
   try {
     const slug = ctx.req.param('slug');
-    const posts = await getRecords(ctx, 'posts', '', slug);
-    console.log('posts');
+    const posts = await getRecords(ctx, 'posts', { limit: 500 }, slug);
     posts.data = posts.data.filter((post) =>
       post.tags.includes(`"posttype\\":\\"${slug}\\"`)
     );
