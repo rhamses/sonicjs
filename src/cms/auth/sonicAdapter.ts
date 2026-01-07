@@ -16,59 +16,59 @@ export const sonicAdapter = (
       setUser: async (user, key) => {
         await d1.setUser(user, key);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
       deleteUser: async (userId) => {
         await d1.deleteUser(userId);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
       updateUser: async (userId, partialUser) => {
         await d1.updateUser(userId, partialUser);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
 
       setSession: async (session) => {
         await d1.setSession(session);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
       deleteSession: async (sessionId) => {
         await d1.deleteSession(sessionId);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
       deleteSessionsByUserId: async (userId) => {
         await d1.deleteSessionsByUserId(userId);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
       updateSession: async (sessionId, partialSession) => {
         await d1.updateSession(sessionId, partialSession);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
 
       setKey: async (key) => {
         await d1.setKey(key);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
       deleteKey: async (keyId) => {
         await d1.deleteKey(keyId);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
       deleteKeysByUserId: async (userId) => {
         await d1.deleteKeysByUserId(userId);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       },
       updateKey: async (keyId, partialKey) => {
         await d1.updateKey(keyId, partialKey);
         await setCacheStatusInvalid();
-        await clearKVCache(kv);
+        // await clearKVCache(kv);
       }
     };
   };
