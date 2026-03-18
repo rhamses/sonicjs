@@ -40,6 +40,12 @@ const api = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 const tables = apiConfig.filter((tbl) => tbl.table !== 'users');
 
 api.use('*', async (ctx, next) => {
+  // Global rule: for every HTTP GET request, disable KV usage completely.
+  // This avoids consuming KV quota for reads/listing in any endpoint.
+  if (ctx.req.method === 'GET') {
+    (ctx as any).set('bypassKvCache', true);
+  }
+
   const bypassHeader =
     ctx.req.header('x-sonic-bypass-kv') ||
     ctx.req.header('x-bypass-kv') ||
