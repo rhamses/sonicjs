@@ -87,7 +87,11 @@ export async function getRecords(
   customDataFunction = undefined
 ): Promise<{ data: any; source: string; total: number; contentType?: any }> {
   log(ctx, { level: 'verbose', message: 'getRecords start', cacheKey });
-  const bypassKvCache = Boolean(ctx?.get?.('bypassKvCache'));
+  const bypassKvCache =
+    Boolean(ctx?.get?.('bypassKvCache')) ||
+    (ctx?.req?.method === 'GET' ? true : false);
+  // Note: if this isn't an HTTP request context (e.g. unit tests), ctx.req may be undefined.
+  // In that case, we only respect ctx.get('bypassKvCache').
   const cacheStatusValid = await isCacheValid();
   // console.log("getRecords cacheStatusValid", cacheStatusValid);
   log(ctx, {
