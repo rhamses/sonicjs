@@ -87,6 +87,7 @@ export async function getRecords(
   customDataFunction = undefined
 ): Promise<{ data: any; source: string; total: number; contentType?: any }> {
   log(ctx, { level: 'verbose', message: 'getRecords start', cacheKey });
+  const bypassKvCache = Boolean(ctx?.get?.('bypassKvCache'));
   const cacheStatusValid = await isCacheValid();
   // console.log("getRecords cacheStatusValid", cacheStatusValid);
   log(ctx, {
@@ -121,7 +122,7 @@ export async function getRecords(
     executionCtx = ctx.executionCtx;
   } catch (err) {}
 
-  if (source == 'fastest' || source == 'kv') {
+  if (!bypassKvCache && (source == 'fastest' || source == 'kv')) {
     log(ctx, {
       level: 'verbose',
       message: 'getRecords getRecordFromKvCache start'
@@ -240,20 +241,22 @@ export async function getRecords(
     message: 'getRecords addToKvCache start'
   });
 
-  if (executionCtx) {
-    ctx.executionCtx.waitUntil(
+  if (!bypassKvCache) {
+    if (executionCtx) {
+      ctx.executionCtx.waitUntil(
+        await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+          data: d1Data,
+          source: 'kv',
+          total
+        })
+      );
+    } else {
       await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
         data: d1Data,
         source: 'kv',
         total
-      })
-    );
-  } else {
-    await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
-      data: d1Data,
-      source: 'kv',
-      total
-    });
+      });
+    }
   }
 
   log(ctx, {

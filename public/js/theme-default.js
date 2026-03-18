@@ -362,6 +362,9 @@ if (document.querySelector('input[name=host]')) {
               document.body.classList.add('loading');
               fetch('/v1/post-duplicate', {
                 method: 'POST',
+                headers: {
+                  'x-sonic-bypass-kv': '1'
+                },
                 body: JSON.stringify({
                   id: row.cells[0].data,
                   posttype: URLParams.get('posttype')
@@ -389,6 +392,9 @@ if (document.querySelector('input[name=host]')) {
     columns,
     server: {
       url: `${window.location.protocol}//${window.location.host}/v1/posts-data?${data}`,
+      headers: {
+        'x-sonic-bypass-kv': '1'
+      },
       then: (posts) => {
         const result = posts.data.map((post) => {
           const {

@@ -16,6 +16,10 @@ function disableKvCacheForToday() {
   kvCacheDisabledUntilTs = nextUtcMidnightMs(Date.now());
 }
 
+export function __resetKvCacheForTests() {
+  kvCacheDisabledUntilTs = 0;
+}
+
 export function getKey(timestamp, table, id): string {
   return `${timestamp}::${table}::${id}`;
 }
