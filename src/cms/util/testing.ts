@@ -7,12 +7,40 @@ import { insertRecord } from '../data/data';
 export function getTestingContext() {
   const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 
+  const createFakeKv = function () {
+    const store = new Map();
+    return {
+      async put(key, value) {
+        store.set(key, value);
+      },
+      async get(key, opts) {
+        const v = store.get(key);
+        if (v == null) return null;
+        if (opts?.type === 'json') return JSON.parse(v);
+        return v;
+      },
+      async delete(key) {
+        store.delete(key);
+      },
+      async list({ prefix = '', limit = 1000 } = {}) {
+        const keys = [...store.keys()]
+          .filter((k) => String(k).startsWith(prefix))
+          .slice(0, limit)
+          .map((name) => ({ name }));
+        return { keys, list_complete: true, cursor: '' };
+      }
+    };
+  };
+
   const toJson = function (json) {
     return json;
   };
 
   const ctx = {
-    env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA },
+    env: {
+      KVDATA: KVDATA ?? createFakeKv(),
+      D1DATA: __D1_BETA__D1DATA
+    },
     json: toJson,
     user: { id: 'fromtest' },
     _var: { user: { userId: 'abc123' } }
