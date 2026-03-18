@@ -38,6 +38,23 @@ import { slugify } from '../../db/config-helpers';
 
 const api = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 const tables = apiConfig.filter((tbl) => tbl.table !== 'users');
+
+api.use('*', async (ctx, next) => {
+  const bypassHeader =
+    ctx.req.header('x-sonic-bypass-kv') ||
+    ctx.req.header('x-bypass-kv') ||
+    '';
+  const referer = ctx.req.header('referer') || '';
+  if (
+    bypassHeader === '1' ||
+    referer.includes('/client/') ||
+    referer.includes('/admin/')
+  ) {
+    ctx.set('bypassKvCache', true);
+  }
+  await next();
+});
+
 tables.forEach((entry) => {
   // console.log("setting route for " + entry.route);
 
