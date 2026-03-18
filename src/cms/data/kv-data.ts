@@ -1,5 +1,21 @@
 import { log } from '../util/logger';
 
+let kvCacheDisabledUntilTs = 0;
+
+function nextUtcMidnightMs(nowMs: number) {
+  const d = new Date(nowMs);
+  d.setUTCHours(24, 0, 0, 0);
+  return d.getTime();
+}
+
+function isKvCacheDisabled() {
+  return kvCacheDisabledUntilTs > Date.now();
+}
+
+function disableKvCacheForToday() {
+  kvCacheDisabledUntilTs = nextUtcMidnightMs(Date.now());
+}
+
 export function getKey(timestamp, table, id): string {
   return `${timestamp}::${table}::${id}`;
 }
@@ -79,6 +95,9 @@ export function saveContentType(db, site, contentTypeComponents) {
 }
 
 export async function addToKvCache(ctx, kv, key, value) {
+  if (isKvCacheDisabled()) {
+    return;
+  }
   const cacheKey = addCachePrefix(key);
 
   // console.log('*** addToKvCache db', db)
@@ -94,9 +113,19 @@ export async function addToKvCache(ctx, kv, key, value) {
     value
   });
 
-  await kv.put(cacheKey, JSON.stringify(value), {
-    metadata: { createdOn }
-  });
+  try {
+    await kv.put(cacheKey, JSON.stringify(value), {
+      metadata: { createdOn }
+    });
+  } catch (error) {
+    disableKvCacheForToday();
+    log(ctx, {
+      level: 'warning',
+      message: 'KV cache put failed; disabling KV cache until next UTC midnight',
+      cacheKey
+    });
+    return;
+  }
 
   // const result = await kv.put(cacheKey, JSON.stringify(value), {
   //   metadata: { createdOn} ,
@@ -122,20 +151,31 @@ export async function addToKvCache(ctx, kv, key, value) {
 }
 
 export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
+  if (isKvCacheDisabled()) {
+    return null;
+  }
   const lookupKey = ignorePrefix ? key : addCachePrefix(key);
   var isJSon = false;
   var results;
   try {
-    results = await db.get(lookupKey, { type: 'json' });
-    isJSon = true;
+    try {
+      results = await db.get(lookupKey, { type: 'json' });
+      isJSon = true;
+    } catch (error) {
+      results = await db.get(lookupKey);
+    }
   } catch (error) {
-    results = await db.get(lookupKey);
+    disableKvCacheForToday();
+    return null;
   }
 
   return results;
 }
 
 export function getKVCache(db) {
+  if (isKvCacheDisabled()) {
+    return { keys: [], list_complete: true, cursor: '' };
+  }
   return getDataListByPrefix(db, addCachePrefix(''));
 }
 
@@ -144,6 +184,9 @@ export function getAllKV(db) {
 }
 
 export async function clearKVCache(db) {
+  if (isKvCacheDisabled()) {
+    return;
+  }
   const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(''));
   for await (const key of itemsToDelete.keys) {
     await deleteKVById(db, key.name);
