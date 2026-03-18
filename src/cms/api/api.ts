@@ -50,7 +50,7 @@ api.use('*', async (ctx, next) => {
     referer.includes('/client/') ||
     referer.includes('/admin/')
   ) {
-    ctx.set('bypassKvCache', true);
+    (ctx as any).set('bypassKvCache', true);
   }
   await next();
 });
@@ -441,8 +441,8 @@ api.post('/post-duplicate', async (ctx) => {
   const { id, posttype } = await ctx.req.json();
   if (!id) return ctx.json({ result: 0 });
   // get post
-  let post = await getRecords(ctx, 'posts', { id }, `post-${id}`);
-  post = post.data;
+  const postResult = await getRecords(ctx, 'posts', { id }, `post-${id}`);
+  const post = postResult.data as any;
   delete post?.id;
   delete post?.createdOn;
   post.tags = JSON.parse(post.tags);
@@ -465,11 +465,11 @@ api.post('/post-duplicate', async (ctx) => {
       },
       `categoriesToPosts-${id}`
     );
-    const newCategories = categoriesToPosts.data.map((item) => {
+    const newCategories = categoriesToPosts.data.map((item: any) => {
       const { categoryId } = item;
       return {
         categoryId,
-        postId: result.data.id
+        postId: (result.data as any).id
       };
     });
     for (const newCategory of newCategories) {
@@ -490,6 +490,10 @@ api.get('/kv-test', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
+  }
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
+  if (bypassKvCache) {
+    return ctx.json({ skipped: true, value: null, metadata: null });
   }
   const createdOn = new Date().getTime();
 
@@ -513,6 +517,10 @@ api.get('/kv-test2', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
+  }
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
+  if (bypassKvCache) {
+    return ctx.json({ skipped: true, value: null, metadata: null });
   }
   const cacheKey = 'kv-test-key2';
   const total = 100;
@@ -542,6 +550,10 @@ api.get('/kv-list', async (ctx) => {
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
   }
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
+  if (bypassKvCache) {
+    return ctx.json({ keys: [], list_complete: true, cursor: '' });
+  }
   const list = await ctx.env.KVDATA.list();
   return ctx.json(list);
 });
@@ -550,6 +562,10 @@ api.get('/data', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
+  }
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
+  if (bypassKvCache) {
+    return ctx.json([]);
   }
   const data = await getDataListByPrefix(ctx.env.KVDATA, '');
   return ctx.json(data);
@@ -589,14 +605,18 @@ api.post('/form-components', async (ctx) => {
 
 api.get('/cache/clear-all', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
 
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
   }
   console.log('clearing cache');
   await clearInMemoryCache();
-  await clearKVCache(ctx.env.KVDATA);
-  return ctx.text('in memory and kv caches cleared');
+  if (!bypassKvCache) {
+    await clearKVCache(ctx.env.KVDATA);
+    return ctx.text('in memory and kv caches cleared');
+  }
+  return ctx.text('in memory cache cleared (kv bypass enabled)');
 });
 
 api.get('/cache/clear-in-memory', async (ctx) => {
@@ -611,12 +631,16 @@ api.get('/cache/clear-in-memory', async (ctx) => {
 
 api.get('/cache/clear-kv', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
   }
   console.log('clearing cache');
-  await clearKVCache(ctx.env.KVDATA);
-  return ctx.text('kv cache cleared');
+  if (!bypassKvCache) {
+    await clearKVCache(ctx.env.KVDATA);
+    return ctx.text('kv cache cleared');
+  }
+  return ctx.text('kv clear skipped (kv bypass enabled)');
 });
 
 api.get('/cache/in-memory', async (ctx) => {
@@ -631,9 +655,14 @@ api.get('/cache/in-memory', async (ctx) => {
 
 api.get('/cache/kv', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
   }
+  if (bypassKvCache) {
+    return ctx.json({ keys: [], list_complete: true, cursor: '' });
+  }
+
   const cacheItems = await getKVCache(ctx.env.KVDATA);
   console.log('getting kv cache', cacheItems);
   return ctx.json(cacheItems);
@@ -641,8 +670,12 @@ api.get('/cache/kv', async (ctx) => {
 
 api.get('/cache/kv/:cacheKey', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
+  }
+  if (bypassKvCache) {
+    return ctx.json(null);
   }
   const cacheKey = ctx.req.param('cacheKey');
   const cacheItem = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
@@ -652,8 +685,12 @@ api.get('/cache/kv/:cacheKey', async (ctx) => {
 
 api.get('/kv', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
+  }
+  if (bypassKvCache) {
+    return ctx.json([]);
   }
   const allItems = await getDataByPrefix(ctx.env.KVDATA, '', 2);
   return ctx.json(allItems);
@@ -661,12 +698,16 @@ api.get('/kv', async (ctx) => {
 
 api.get('/kv/:cacheKey', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
   }
   const cacheKey = ctx.req.param('cacheKey');
   console.log('getting kv cache', cacheKey);
 
+  if (bypassKvCache) {
+    return ctx.json(null);
+  }
   const cacheItem = await getRecordFromKvCache(
     ctx.env.KVDATA,
     'http://127.0.0.1:8788/admin/api/users'
@@ -677,22 +718,27 @@ api.get('/kv/:cacheKey', async (ctx) => {
 
 api.get('/kv/delete-all', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
+  const bypassKvCache = Boolean((ctx as any).get('bypassKvCache'));
   if (!canProceed) {
     return ctx.text('Unauthorized', 401);
   }
-  await clearAllKVRecords(ctx.env.KVDATA);
-  return ctx.text('ok');
+  if (!bypassKvCache) {
+    await clearAllKVRecords(ctx.env.KVDATA);
+  }
+  return ctx.text(bypassKvCache ? 'delete skipped (kv bypass enabled)' : 'ok');
 });
 
 api.route('/bucket', bucketApi);
 
 api.get('/random-job', async (ctx) => {
-  let posts = await getRecords(ctx, 'posts', '', 'posts');
-  posts = posts.data.filter((post) => post.image && post.tags.includes('jobs'));
-  const post = posts[Math.floor(Math.random() * posts.length)];
+  const postsResult = await getRecords(ctx, 'posts', '', 'posts');
+  const filteredPosts = postsResult.data.filter(
+    (post: any) => post.image && post.tags.includes('jobs')
+  );
+  const post = filteredPosts[Math.floor(Math.random() * filteredPosts.length)];
   const ext = post.image.match(/\.[a-z]{3}$/gim)[0].replace('.', '');
-  const image = await fetch(post.image).then((r) => r.blob());
-  return ctx.body(image, 200, {
+  const image = await fetch(post.image).then((r) => r.arrayBuffer());
+  return ctx.body(image as any, 200, {
     'Content-Type': 'image/' + ext
   });
 });
