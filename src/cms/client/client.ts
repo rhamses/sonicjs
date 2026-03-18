@@ -59,6 +59,7 @@ function pageTitle(posttype, menu) {
 const client = new Hono();
 
 client.use('*', async (ctx, next) => {
+  ctx.set('bypassKvCache', true);
   const path = ctx.req.path;
   let canUseAdmin = await config.adminAccessControl(ctx);
   if (!canUseAdmin) {

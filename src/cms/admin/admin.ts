@@ -31,6 +31,7 @@ import { hasUser } from '../auth/auth-helpers';
 const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 admin.use('*', async (ctx, next) => {
+  ctx.set('bypassKvCache', true);
   const path = ctx.req.path;
   let canUseAdmin = await config.adminAccessControl(ctx);
   if (!canUseAdmin) {
